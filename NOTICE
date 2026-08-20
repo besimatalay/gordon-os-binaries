@@ -1,16 +1,34 @@
-﻿GordonOS â€” Binary Distribution Notice
-=====================================
+GordonOS — Third-Party Notices
+================================
 
-GordonOS â€” Preemptive multitasking kernel for the Commodore 64
-Copyright (C) 2024-2026 Besim Atalay
-Licensed under the GNU General Public License, version 2 or (at your
-option) any later version.
+EhBASIC v2.22p5
+---------------
+Derived from EhBASIC.
+Original by Lee Davison (C) 2001–2016.
+Contact: leeedavison@googlemail.com
+Website: http://members.multimania.co.uk/leeedavison/
 
-Derived from EhBASIC
---------------------
-This binary distribution includes code derived from EhBASIC v2.22p5,
-original by Lee Davison (C) 2001-2016. EhBASIC is free for non-commercial
-use; any derivative work must include the string "Derived from EhBASIC"
-in binary images distributed.
+EhBASIC is free but not copyright free. For non commercial use there
+is only one restriction, any derivative work should include, in any
+binary image distributed, the string "Derived from EhBASIC" and in
+any distribution that includes human readable files a file that
+includes the above string in a human readable form.
 
-For commercial use, contact Lee Davison.
+For commercial use please contact Lee Davison for conditions.
+
+6502 ROM File System (filesys.asm)
+----------------------------------
+Some REU filesystem routines in `src/kernel/reu-fs.inc` are adapted
+from Lee Davison's simple ROM filesystem for 6502
+(`reference/filesys.asm`) — notably the file/directory search
+algorithm (`LAB_find`), the directory entry format, and the flags
+convention, ported from C64-memory access to REU DMA.
+
+Original by Lee Davison.
+Contact: leeedavison@googlemail.com
+Website: http://members.multimania.co.uk/leeedavison/
+
+Lee Davison's code is free but not copyright free; distribution of
+derivative works is permitted for non commercial use.
+
+For commercial use please contact Lee Davison for conditions.

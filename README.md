@@ -1,8 +1,8 @@
-﻿# GordonOS â€” Binaries
+# GordonOS - Binaries
 
 Prebuilt binaries for **GordonOS**, a preemptive multitasking kernel for the
 Commodore 64. This repository contains only the binaries needed to *run*
-GordonOS â€” source code is not included here.
+GordonOS - source code is not included here.
 
 ## Files
 
@@ -23,7 +23,7 @@ x64sc -reu -reuimagesize 16384 -reuimage /absolute/path/to/REU.bin gordon-os.prg
 ```
 
 Or drag `gordon-os.prg` into the VICE window, then load the image via
-**Settings â†’ Cartridges â†’ RAM Expansion Module â†’ 16384K â†’ Browse** and
+**Settings > Cartridges > RAM Expansion Module > 16384K > Browse** and
 select `REU.bin`.
 
 After boot the shell prompts; try `dir`, `ps`, `run border`, `help`.

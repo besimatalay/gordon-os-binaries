@@ -29,7 +29,7 @@ features:
 Both files are required: the kernel boots the shell and bundled tasks from
 the REU filesystem.
 
-## Run it
+## Run it with VICE
 
 Requires [VICE](https://vice-emu.sourceforge.io/) (`x64sc`) with REU support.
 

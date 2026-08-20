@@ -41,6 +41,27 @@ Or drag `gordon-os.prg` into the VICE window, then load the image via
 **Settings > Cartridges > RAM Expansion Module > 16384K > Browse** and
 select `REU.bin`.
 
+## Run on a C64 Ultimate / Ultimate 64
+
+The same files run on real hardware via the built-in 16 MB REU of the
+Ultimate-II+ cartridge or an Ultimate 64 board:
+
+1. Copy `gordon-os.prg` and `REU.bin` to a FAT32 USB flash drive and insert it.
+2. Boot into the Ultimate menu (middle button on the Ultimate-II+; the menu
+   button on an Ultimate 64).
+3. Press **F2** to open the configuration menu, then open
+   **Cartridge and ROM Settings** and enable the **RAM Expansion Unit (REU)**
+   with a size of **16 MB**.
+4. Load the REU image: set the REU profile to `REU.bin` on the USB drive (or
+   enable the REU save/restore option to load it automatically at power-up).
+5. Return to the file browser, select `gordon-os.prg`, press RETURN and choose
+   **Run** (DMA load) to start GordonOS.
+
+Note: the REU image is a raw 16,777,216-byte memory dump, so it is directly
+compatible between VICE and the Ultimate. VICE typically expects a `.reu`
+extension while the Ultimate usually expects `.bin` - just rename the file if
+your setup needs it. No conversion is required.
+
 ## Quick start - what you can do
 
 After boot you land in the shell (a blinking block cursor). Try:

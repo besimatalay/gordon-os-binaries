@@ -111,3 +111,10 @@ boots.
 
 GordonOS is licensed under the GNU GPL v2 or later - see `LICENSE.md`.
 Third-party notices (EhBASIC, filesystem code) are in `NOTICE`.
+
+## Contact
+
+The GordonOS source repository is **not public yet** — the system is still in
+active development. If you'd like to contribute, or have help, suggestions, or
+code to offer, contact **Besim Atalay** at
+[besim.atalay@gmail.com](mailto:besim.atalay@gmail.com).

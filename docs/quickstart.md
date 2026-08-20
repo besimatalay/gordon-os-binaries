@@ -1,4 +1,4 @@
-# Quick start
+# Quick Start
 
 After boot you land in the shell (a blinking block cursor). Try:
 
@@ -11,7 +11,7 @@ After boot you land in the shell (a blinking block cursor). Try:
 | `run maze`    | Animated maze renderer              |
 | `run clock`   | Real-time clock                     |
 | `run threads` | Thread demo (spawns `threads.N`)    |
-| `run basic`   | [Gordon Basic](gordonbasic.md) interpreter |
+| `run basic`   | [Gordon BASIC](gordonbasic.md) interpreter |
 | `run gfxdemo` | Bitmap graphics demo                |
 
 Task management: `kill <id>`, `pause <id>`, `resume <id>`, `prio <id> <0-5>`

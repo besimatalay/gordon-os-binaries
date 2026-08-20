@@ -52,15 +52,18 @@ the REU filesystem.
 
 ## Run it with VICE
 
-Requires [VICE](https://vice-emu.sourceforge.io/) (`x64sc`) with REU support.
+Requires [VICE](https://vice-emu.sourceforge.io/) **3.10 or later** (`x64sc`)
+with REU support. Older versions use the removed `-reuimagesize` flag.
 
 ```bash
-x64sc -reu -reuimagesize 16384 -reuimage /absolute/path/to/REU.bin gordon-os.prg
+x64sc -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw gordon-os.prg
 ```
 
-Or drag `gordon-os.prg` into the VICE window, then load the image via
-**Settings > Cartridges > RAM Expansion Module > 16384K > Browse** and
-select `REU.bin`.
+`-reuimagerw` writes the REU image back to disk when VICE exits, so files
+you `save` in GordonOS persist. Or drag `gordon-os.prg` into the VICE window,
+then load the image via **Settings > Cartridges > RAM Expansion Module >
+16384K > Browse**, select `REU.bin`, and check **"Write image on detach/emulator
+exit"** there so saved files persist.
 
 ## Run on a C64 Ultimate / Ultimate 64
 

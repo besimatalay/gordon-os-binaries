@@ -39,7 +39,8 @@ Key features:
 - REU filesystem - `format`/`save`/`load`/`del`/`dir`, persists across reboots
 - IRQ-driven keyboard - 16-byte ring buffer, key repeat, F-key screen switching
 - Interactive shell - line editing, cursor keys, blinking cursor
-
+- Batch file support as .bat files
+- Dynamic loading of charsets as .fnt files
 ## Files
 
 | File            | Size   | Purpose                                     |

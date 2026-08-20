@@ -44,23 +44,39 @@ select `REU.bin`.
 ## Run on a C64 Ultimate / Ultimate 64
 
 The same files run on real hardware via the built-in 16 MB REU of the
-Ultimate-II+ cartridge or an Ultimate 64 board:
+Ultimate-II+ cartridge or an Ultimate 64 board. The REU image is a raw
+16,777,216-byte memory dump, and the Ultimate accepts any filename or
+extension, so `REU.bin` works as-is.
 
 1. Copy `gordon-os.prg` and `REU.bin` to a FAT32 USB flash drive and insert it.
 2. Boot into the Ultimate menu (middle button on the Ultimate-II+; the menu
    button on an Ultimate 64).
-3. Press **F2** to open the configuration menu, then open
-   **Cartridge and ROM Settings** and enable the **RAM Expansion Unit (REU)**
-   with a size of **16 MB**.
-4. Load the REU image: set the REU profile to `REU.bin` on the USB drive (or
-   enable the REU save/restore option to load it automatically at power-up).
-5. Return to the file browser, select `gordon-os.prg`, press RETURN and choose
-   **Run** (DMA load) to start GordonOS.
+3. Press **F2**, open **C64 and Cartridge Settings**, and enable the
+   **RAM Expansion Unit (REU)** with a size of **16 MB**.
 
-Note: the REU image is a raw 16,777,216-byte memory dump, so it is directly
-compatible between VICE and the Ultimate. VICE typically expects a `.reu`
-extension while the Ultimate usually expects `.bin` - just rename the file if
-your setup needs it. No conversion is required.
+Then load the REU image using either method:
+
+- **Manual on-demand load:** in the file browser, highlight `REU.bin`, press
+  **Return**, and choose **Load into REU**.
+- **Persistent boot preload:** in settings, set **REU Preload Image** to
+  `REU.bin` on the USB drive (e.g. `/Usb0/REU.bin`) and set **REU Preload** to
+  **Enabled**.
+
+Finally, return to the file browser, select `gordon-os.prg`, press **Return**
+and choose **Run** (DMA load) to start GordonOS.
+
+### Persistence
+
+The Ultimate does not automatically write the REU contents back to USB. Any
+changes GordonOS makes (for example files you `save`) live in REU memory only
+until you export them. Before powering down:
+
+1. Press the **Menu** button to interrupt the C64.
+2. Press **F5** to open the Command/Action menu.
+3. Navigate to **C64 Machine**.
+4. Select **Save REU Memory**.
+5. Enter a filename (e.g. `REU.bin` to overwrite the image) and press Enter to
+   write the raw 16 MB block back to the USB drive.
 
 ## Quick start - what you can do
 

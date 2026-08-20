@@ -1,0 +1,16 @@
+﻿GordonOS â€” Binary Distribution Notice
+=====================================
+
+GordonOS â€” Preemptive multitasking kernel for the Commodore 64
+Copyright (C) 2024-2026 Besim Atalay
+Licensed under the GNU General Public License, version 2 or (at your
+option) any later version.
+
+Derived from EhBASIC
+--------------------
+This binary distribution includes code derived from EhBASIC v2.22p5,
+original by Lee Davison (C) 2001-2016. EhBASIC is free for non-commercial
+use; any derivative work must include the string "Derived from EhBASIC"
+in binary images distributed.
+
+For commercial use, contact Lee Davison.

@@ -8,16 +8,36 @@ is not included here.
 ## What is GordonOS?
 
 GordonOS is a from-scratch OS kernel for the C64 + REU. Both KERNAL and BASIC
-ROMs are banked out, giving the kernel full control of all 64KB of RAM. Key
-features:
+ROMs are banked out, giving the kernel full control of all 64KB of RAM.
 
-- Preemptive multitasking (~60 Hz round-robin scheduler, per-task priority)
-- Dynamic task loader - `run <name>` loads task binaries from the REU
-  filesystem at runtime (relocatable + reentrant tasks)
-- Gordon Basic (derived from EhBASIC) - `run basic`
-- Per-task virtual screens and bitmap graphics
+Everything is bitmap: the VIC-II stays in hires bitmap mode permanently, and
+"text" is an 8x8 glyph layer blitted on top of bitmap surfaces. Every screen
+is a 10 KB REU bitmap slot, and each task can own up to 8 virtual screens with
+their own cursor, colors and charset.
+
+Fully relocatable and reentrant tasks are a major feature: the same binary can
+be loaded into multiple instances at any free address. The system supports up
+to 24 concurrent tasks, each with its own full 256-byte stack and a preserved
+zero-page region.
+
+Key features:
+
+- Preemptive multitasking - CIA #1 timer interrupts at ~60 Hz, round-robin
+  scheduler with per-task priority (0-5)
+- Dynamic task loader - `run <name>` loads relocatable + reentrant task
+  binaries from the REU filesystem at runtime, with pool eviction when the
+  pool is full
+- Gordon Basic (derived from EhBASIC) - full floating-point BASIC, `run basic`
+- REU-accelerated context switches - each task gets its own full 256-byte
+  stack, saved/restored by DMA
+- Per-task ZP preservation - tasks can preserve their own zero-page (ZP)
+  memory across context switches
+- Bitmap graphics - REU-backed hires bitmap surfaces (28 slots), text/bitmap
+  coexistence via char shadows
+- Thread support - tasks can spawn child threads that share the parent's memory
 - REU filesystem - `format`/`save`/`load`/`del`/`dir`, persists across reboots
-- Interactive shell with line editing
+- IRQ-driven keyboard - 16-byte ring buffer, key repeat, F-key screen switching
+- Interactive shell - line editing, cursor keys, blinking cursor
 
 ## Files
 

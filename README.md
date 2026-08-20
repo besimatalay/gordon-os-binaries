@@ -27,7 +27,8 @@ Key features:
 - Dynamic task loader - `run <name>` loads relocatable + reentrant task
   binaries from the REU filesystem at runtime, with pool eviction when the
   pool is full
-- Gordon Basic (derived from EhBASIC) - full floating-point BASIC, `run basic`
+- [Gordon Basic](docs/gordonbasic.md) (derived from EhBASIC) - full
+  floating-point BASIC, `run basic`
 - REU-accelerated context switches - each task gets its own full 256-byte
   stack, saved/restored by DMA
 - Per-task ZP preservation - tasks can preserve their own zero-page (ZP)
@@ -111,7 +112,7 @@ After boot you land in the shell (a blinking block cursor). Try:
 | `run maze`    | Animated maze renderer              |
 | `run clock`   | Real-time clock                     |
 | `run threads` | Thread demo (spawns `threads.N`)    |
-| `run basic`   | Gordon Basic interpreter            |
+| `run basic`   | [Gordon Basic](docs/gordonbasic.md) interpreter |
 | `run gfxdemo` | Bitmap graphics demo                |
 
 Task management: `kill <id>`, `pause <id>`, `resume <id>`, `prio <id> <0-5>`

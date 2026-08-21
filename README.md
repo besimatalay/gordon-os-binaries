@@ -36,7 +36,7 @@ Key features:
 - Bitmap graphics - REU-backed hires bitmap surfaces (28 slots), text/bitmap
   coexistence via char shadows
 - Thread support - tasks can spawn child threads that share the parent's memory
-- REU filesystem - `format`/`save`/`load`/`del`/`dir`, persists across reboots
+- REU filesystem - `format`/`save`/`load`/`del`/`rename`/`dir`/`type`/`fsinfo`, persists across reboots
 - IRQ-driven keyboard - 16-byte ring buffer, key repeat, F-key screen switching
 - Interactive shell - line editing, cursor keys, blinking cursor
 - Batch file support as .bat files

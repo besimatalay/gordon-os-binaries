@@ -6,7 +6,8 @@ Gordon Basic is a full floating-point Microsoft BASIC 2.0-compatible
 interpreter that runs as a **task** on GordonOS. It is loaded on demand
 from the REU filesystem with `run basic` and runs on its own screen with
 case-preserving input, RUN/STOP-to-break, and C64 screen-editor-style line
-editing. Programs live in 10 KB of RAM at `$8000–$A7FF`.
+editing. Programs live in runtime-sized program RAM (a `kMalloc` block
+sized at launch).
 
 ## Provenance
 
@@ -439,9 +440,15 @@ where `n` is the line number.
 From the shell:
 
 ```
-run basic          ← launch BASIC on its own screen
+run basic <pages>  ← launch BASIC with <pages> × 256B of program RAM
+                     (required — e.g. `run basic 40` = 10 KB; no default)
 view basic         ← switch back to BASIC's screen (after run basic)
 ```
+
+- Program RAM is a `kMalloc` block sized at launch (`run basic 40` =
+  10 KB; page size is 256B, configurable via `pool.inc`). `FRE(0)` reports
+  the size of that run.
+- **`pool`** (shell command) lists pool allocations and their owners.
 
 - **`RUN/STOP`** breaks a running program (CTRL-C equivalent).
 - **`DEL`** is backspace during line input.

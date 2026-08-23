@@ -4,6 +4,17 @@ After boot you land in the shell (a blinking block cursor). The shell is
 itself a dynamic task (`shell.tsk`) loaded from the REU filesystem by the
 boot task.
 
+The kernel includes a generic page-granular heap (`kMalloc`/`kFree`):
+task-owned blocks allocated from the task pool, preserved across pool
+eviction, and freed on exit. BASIC's program RAM is a `kMalloc` block sized
+with `run basic <N>`.
+
+Cold kernel code ships as **shared dynamic libraries** — `time.lib`,
+`fswrite.lib`, `gfx.lib` — loaded into the pool on demand and freed when their
+last consumer exits (see [docs/dynamic-libraries.md](docs/dynamic-libraries.md)).
+The `.tsk` tasks `gfxdemo`, `border`, `maze` and `threads` are **re-runnable**:
+`run` them multiple times for a fresh copy each time.
+
 ## Shell built-ins
 
 | Command | What it does |
@@ -12,7 +23,8 @@ boot task.
 | `clear` | Clear the shell's screen |
 | `view <id>` | Switch the display to a task's screen |
 | `exit` | Exit the shell |
-| `run <file>` | Load + run a `.tsk` task from the REU FS (foreground) |
+| `run <file> [pages]` | Load + run a `.tsk` task from the REU FS (foreground) |
+| `pool` | Print the task-pool map (pages, owners, sizes) |
 | `runbatch <file>` | Run a `.bat` batch script from the REU FS |
 | `print <text>` | Print text |
 | `fsinfo` | Show FS status (active, banks, size) |
@@ -46,13 +58,24 @@ All 8 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | File | Run with | What it does |
 |---|---|---|
 | `shell.tsk` | (boot) | The interactive shell itself |
-| `basic.tsk` | `run basic` | [Gordon BASIC](gordonbasic.md) interpreter (EhBASIC) + line editor |
+| `basic.tsk` | `run basic <N>` | [Gordon BASIC](gordonbasic.md) interpreter (EhBASIC) + line editor; N = program-RAM pages (256B each) |
 | `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor; opens the file or starts blank (terminate with `kill edit`) |
 | `border.tsk` | `run border` | Border color flash demo |
 | `maze.tsk` | `run maze` | Animated 10 PRINT maze renderer |
 | `clock.tsk` | `run clock` | Real-time clock at (0,0) on the shared screen |
 | `threads.tsk` | `run threads` | Thread demo — spawns two child threads (border inc/dec) |
 | `gfxdemo.tsk` | `run gfxdemo` | Bitmap graphics demo — star (`kLine`), boxes (`kBox`/`kFillBox`), diagonals (`kPlot`) |
+
+## `.lib` shared libraries
+
+Loaded into the pool on demand by the kernel and freed at refcount 0 — see
+[docs/dynamic-libraries.md](docs/dynamic-libraries.md):
+
+| File | Used by | Holds |
+|---|---|---|
+| `time.lib` | `clock`, `time` | getTime / setTime / printTime |
+| `fswrite.lib` | shell, `basic`, `format`, `rename` | format / save / delete / rename |
+| `gfx.lib` | `gfxdemo` | plot / line / box / fillBox / clearBitmap + 5 stubs |
 
 ## Fonts and batch files
 

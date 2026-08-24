@@ -58,7 +58,7 @@ All 8 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 
 | File | Run with | What it does |
 |---|---|---|
-| `shell.tsk` | (boot) | The interactive shell itself |
+| `shell.tsk` | `run shell` | The interactive shell itself. This is a re-entrant task that is started automatically when the system boots but you can also run multiple copies of it if you wish |
 | `basic.tsk` | `run basic <N>` | [Gordon BASIC](gordonbasic.md) interpreter (EhBASIC) + line editor; N = program-RAM pages (256B each) |
 | `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor; opens the file or starts blank (terminate with `kill edit`) |
 | `border.tsk` | `run border` | Border color flash demo |

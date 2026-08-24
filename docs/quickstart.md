@@ -65,7 +65,7 @@ All 8 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | `maze.tsk` | `run maze` | Animated 10 PRINT maze renderer |
 | `clock.tsk` | `run clock` | Real-time clock at (0,0) on the shared screen |
 | `threads.tsk` | `run threads` | Thread demo — spawns two child threads (border inc/dec) |
-| `gfxdemo.tsk` | `run gfxdemo` | Bitmap graphics demo — star (`kLine`), boxes (`kBox`/`kFillBox`), diagonals (`kPlot`) |
+| `gfxdemo.tsk` | `run gfxdemo [step]` | Spider-web line weave — four symmetric corner fans of `kLine` strokes; `step` = line interval 1–25 (default 5, smaller = tighter weave) |
 
 ## `.lib` shared libraries
 

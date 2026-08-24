@@ -1,5 +1,7 @@
 # GordonOS - Binaries
 
+> Preemptive multitasking kernel for the Commodore 64 with REU — **v0.9.5**
+
 Prebuilt binaries for **GordonOS**, a preemptive multitasking operating
 system kernel for the Commodore 64 with a RAM Expansion Unit (REU). This
 repository contains only the binaries needed to *run* GordonOS - source code

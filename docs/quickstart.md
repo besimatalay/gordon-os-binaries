@@ -78,7 +78,7 @@ Loaded into the pool on demand by the kernel and freed at refcount 0 — see
 | `fswrite.lib` | shell, `basic`, `format`, `rename` | format / save / delete / rename |
 | `gfx.lib` | `gfxdemo` | plot / line / box / fillBox / clearBitmap + 5 stubs |
 
-## Fonts and batch files
+## Fonts, banners and batch files
 
 | File | Used by |
 |---|---|
@@ -86,6 +86,7 @@ Loaded into the pool on demand by the kernel and freed at refcount 0 — see
 | `c64uppr.fnt` | Stock C64 uppercase/graphics set (`setfont c64uppr`) |
 | `c64low.fnt` | Stock C64 lowercase/uppercase set (`setfont c64low`) |
 | `boot.bat` | Batch script run automatically at boot |
+| `*.bnr` | Custom-glyph banners drawn with `banner <name> <row> <col>` — every `.bnr` from `src/banners/` is bundled |
 
 Screen switching: F1/F3/F5/F7 and Shift+F1/F3/F5/F7 cycle the 8 virtual
 screens. Files in the REU filesystem persist across reboots.

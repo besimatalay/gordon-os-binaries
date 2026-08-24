@@ -46,7 +46,8 @@ Key features:
 - Thread support - tasks can spawn child threads that share the parent's memory
 - REU filesystem - `format`/`save`/`load`/`del`/`rename`/`dir`/`type`/`fsinfo`, persists across reboots
 - IRQ-driven keyboard - 16-byte ring buffer, key repeat, F-key screen switching
-- Interactive shell - line editing, cursor keys, blinking cursor
+- Interactive shell - line editing, cursor keys, blinking cursor,
+  custom-glyph `.bnr` banners (`banner <file> <row> <col>`)
 - Batch file support as .bat files
 - Dynamic loading of charsets as .fnt files
 ## Files

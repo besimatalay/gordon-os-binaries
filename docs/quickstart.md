@@ -35,7 +35,7 @@ The `.tsk` tasks `gfxdemo`, `border`, `maze` and `threads` are **re-runnable**:
 ## `.com` command tasks
 
 Each command is a separate relocatable task that runs on the shell's
-shared screen and exits when done. All 11 are bundled in the REU image:
+shared screen and exits when done. All 12 are bundled in the REU image:
 
 | File | Usage | What it does |
 |---|---|---|
@@ -50,6 +50,7 @@ shared screen and exits when done. All 11 are bundled in the REU image:
 | `type.com` | `type <file>` | Dump a file's raw bytes to the shell screen (e.g. `type boot.bat`) |
 | `setfont.com` | `setfont <name>` | Load `<name>.fnt` from the REU FS into `FONT_BASE` (switches the system font; base name ≤ 7 chars) |
 | `rename.com` | `rename <old> <new>` | Rename an REU FS file |
+| `banner.com` | `banner <file> <row> <col>` | Draw a `.bnr` custom-glyph banner at (row, col) on the shell's screen (base name ≤ 7 chars) |
 
 ## `.tsk` task files
 

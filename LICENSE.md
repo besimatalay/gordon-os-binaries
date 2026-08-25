@@ -15,7 +15,7 @@ the Free Software Foundation; either version 2 of the License, or
 
 **EhBASIC v2.22p5** — Enhanced 6502 BASIC interpreter.
 Copyright (C) 2001–2016 Lee Davison.
-Included as `src/tasks/ehbasic.asm` with GordonOS I/O patches in `src/tasks/basic.inc`.
+Included as `src/tasks/dynamic/ehbasic.asm` with GordonOS I/O patches in `src/tasks/basic.inc`.
 Distributed under Lee Davison's terms: free for non-commercial use;
 any derivative work must include the string "Derived from EhBASIC"
 in binary distributions. See `NOTICE` file for details.

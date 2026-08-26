@@ -22,8 +22,7 @@ same binary can be loaded into multiple instances at any free address
 (reentrant shares one code copy; re-runnable loads a fresh copy per `run`).
 The system supports up to 24 concurrent tasks, each with its own full 256-byte
 stack and a preserved zero-page region. Cold kernel code (time/fswrite/gfx/fp)
-ships as shared, refcounted `.lib` binaries loaded on demand — see
-[docs/dynamic-libraries.md](docs/dynamic-libraries.md).
+ships as shared `.lib` binaries loaded on demand.
 
 Key features:
 
@@ -33,15 +32,14 @@ Key features:
   re-runnable task binaries from the REU filesystem at runtime, with pool
   eviction when the pool is full
 - Dynamic kernel libraries - shared `.lib` binaries (time/fswrite/gfx/fp) loaded
-  on demand via jump-table vector stubs, freed at refcount 0
-- Generic kernel heap - page-granular `kMalloc`/`kFree` (task-owned blocks,
-  preserved across eviction via REU shadows, freed on exit); `run basic <N>`
-  sizes BASIC's program RAM, `pool` shows the pool map
-- [Gordon Basic](docs/gordonbasic.md) (derived from EhBASIC) - full
-  floating-point BASIC, `run basic <N>` sizes the program RAM
-- Shared floating-point library - `fp.lib` (the EhBASIC FP core as a
-  refcounted `.lib`) consumed by BASIC and the `fpdemo` task, which draws
-  a sine + cosine wave pixel by pixel across the full bitmap
+  on demand
+- Generic kernel heap - task-owned memory blocks preserved across eviction;
+  `run basic <N>` sizes BASIC's program RAM, `pool` shows the pool map
+- Gordon Basic (derived from EhBASIC) - full floating-point BASIC,
+  `run basic <N>` sizes the program RAM
+- Shared floating-point library - `fp.lib` (the EhBASIC FP core) consumed
+  by BASIC and the `fpdemo` task, which draws a sine + cosine wave pixel by
+  pixel across the full bitmap
 - REU-accelerated context switches - each task gets its own full 256-byte
   stack, saved/restored by DMA
 - Per-task ZP preservation - tasks can preserve their own zero-page (ZP)
@@ -119,8 +117,8 @@ until you export them. Before powering down:
 
 ## Quick start
 
-See [Quick start](docs/quickstart.md) for what you can do once the shell
-boots.
+See the quick-start guide (`docs/quickstart.md`) for what you can do once
+the shell boots.
 
 ## License / Notice
 

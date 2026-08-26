@@ -4,14 +4,9 @@ After boot you land in the shell (a blinking block cursor). The shell is
 itself a dynamic task (`shell.tsk`) loaded from the REU filesystem by the
 boot task.
 
-The kernel includes a generic page-granular heap (`kMalloc`/`kFree`):
-task-owned blocks allocated from the task pool, preserved across pool
-eviction, and freed on exit. BASIC's program RAM is a `kMalloc` block sized
-with `run basic <N>`.
+BASIC's program RAM is a memory block sized with `run basic <N>`
+(256-byte pages).
 
-Cold kernel code ships as **shared dynamic libraries** — `time.lib`,
-`fswrite.lib`, `gfx.lib`, `fp.lib` â€” loaded into the pool on demand and freed when their
-last consumer exits (see [docs/dynamic-libraries.md](docs/dynamic-libraries.md)).
 The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-runnable**:
 `run` them multiple times for a fresh copy each time.
 
@@ -34,8 +29,8 @@ The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-ru
 
 ## `.com` command tasks
 
-Each command is a separate relocatable task that runs on the shell's
-shared screen and exits when done. All 12 are bundled in the REU image:
+Each command runs on the shell's shared screen and exits when done.
+All 12 are bundled in the REU image:
 
 | File | Usage | What it does |
 |---|---|---|
@@ -59,25 +54,25 @@ All 9 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | File | Run with | What it does |
 |---|---|---|
 | `shell.tsk` | `run shell` | The interactive shell itself. This is a re-entrant task that is started automatically when the system boots, but you can also run multiple copies of it if you wish |
-| `basic.tsk` | `run basic <N>` | [Gordon BASIC](gordonbasic.md) interpreter (EhBASIC) + line editor; N = program-RAM pages (256B each) |
+| `basic.tsk` | `run basic <N>` | Gordon BASIC interpreter (EhBASIC) + line editor; N = program-RAM pages (256B each) |
 | `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor; opens the file or starts blank (terminate with `kill edit`) |
 | `border.tsk` | `run border` | Border color flash demo |
 | `maze.tsk` | `run maze` | Animated 10 PRINT maze renderer |
 | `clock.tsk` | `run clock` | Real-time clock at (0,0) on the shared screen |
 | `threads.tsk` | `run threads` | Thread demo — spawns two child threads (border inc/dec) |
-| `gfxdemo.tsk` | `run gfxdemo [step]` | Spider-web line weave — four symmetric corner fans of `kLine` strokes; `step` = line interval 1–25 (default 5, smaller = tighter weave) |
-| `fpdemo.tsk` | `run fpdemo` | The `fp.lib` showcase: a sine wave edge to edge with a cosine wave superimposed, computed **pixel by pixel** (`FSIN`/`FCOS`) and plotted with `kPlot`; peaks/troughs touch the top and bottom of the screen. Slow by design (yields every pixel), then idles with the bitmap on screen |
+| `gfxdemo.tsk` | `run gfxdemo [step]` | Spider-web line weave — four symmetric corner fans of lines; `step` = line interval 1–25 (default 5, smaller = tighter weave) |
+| `fpdemo.tsk` | `run fpdemo` | Floating-point showcase: a sine wave drawn edge to edge with a cosine wave superimposed, computed pixel by pixel; peaks and troughs touch the top and bottom of the screen. Slow by design, then idles with the finished bitmap on screen |
 ## `.lib` shared libraries
 
-Loaded into the pool on demand by the kernel and freed at refcount 0 — see
-[docs/dynamic-libraries.md](docs/dynamic-libraries.md):
+These four library files are bundled in the REU image and are loaded
+automatically when a task needs them:
 
-| File | Used by | Holds |
+| File | Used by | Provides |
 |---|---|---|
-| `time.lib` | `clock`, `time` | getTime / setTime / printTime |
-| `fswrite.lib` | shell, `basic`, `format`, `rename` | format / save / delete / rename |
-| `gfx.lib` | `gfxdemo`, `fpdemo` | plot / line / box / fillBox / clearBitmap + 5 stubs |
-| `fp.lib` | `basic`, `fpdemo` | EhBASIC floating-point core: 26-opcode `fpExec` dispatcher (add/sub/mul/div/pow/trig/log/exp/rnd/conversions/…) |
+| `time.lib` | `clock`, `time` | Clock reading and printing |
+| `fswrite.lib` | shell, `basic`, `format`, `rename` | Filesystem format/save/delete/rename |
+| `gfx.lib` | `gfxdemo`, `fpdemo` | Bitmap drawing |
+| `fp.lib` | `basic`, `fpdemo` | Floating-point math |
 
 ## Fonts, banners and batch files
 
@@ -87,7 +82,7 @@ Loaded into the pool on demand by the kernel and freed at refcount 0 — see
 | `c64uppr.fnt` | Stock C64 uppercase/graphics set (`setfont c64uppr`) |
 | `c64low.fnt` | Stock C64 lowercase/uppercase set (`setfont c64low`) |
 | `boot.bat` | Batch script run automatically at boot |
-| `*.bnr` | Custom-glyph banners drawn with `banner <name> <row> <col>` — every `.bnr` from `src/banners/` is bundled |
+| `*.bnr` | Custom-glyph banners drawn with `banner <name> <row> <col>` — every bundled `.bnr` is listed by `dir` |
 
 Screen switching: F1/F3/F5/F7 and Shift+F1/F3/F5/F7 cycle the 8 virtual
 screens. Files in the REU filesystem persist across reboots.

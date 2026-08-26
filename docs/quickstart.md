@@ -10,9 +10,9 @@ eviction, and freed on exit. BASIC's program RAM is a `kMalloc` block sized
 with `run basic <N>`.
 
 Cold kernel code ships as **shared dynamic libraries** — `time.lib`,
-`fswrite.lib`, `gfx.lib` — loaded into the pool on demand and freed when their
+`fswrite.lib`, `gfx.lib`, `fp.lib` â€” loaded into the pool on demand and freed when their
 last consumer exits (see [docs/dynamic-libraries.md](docs/dynamic-libraries.md)).
-The `.tsk` tasks `gfxdemo`, `border`, `maze` and `threads` are **re-runnable**:
+The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-runnable**:
 `run` them multiple times for a fresh copy each time.
 
 ## Shell built-ins
@@ -54,7 +54,7 @@ shared screen and exits when done. All 12 are bundled in the REU image:
 
 ## `.tsk` task files
 
-All 8 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
+All 9 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 
 | File | Run with | What it does |
 |---|---|---|
@@ -66,7 +66,7 @@ All 8 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | `clock.tsk` | `run clock` | Real-time clock at (0,0) on the shared screen |
 | `threads.tsk` | `run threads` | Thread demo — spawns two child threads (border inc/dec) |
 | `gfxdemo.tsk` | `run gfxdemo [step]` | Spider-web line weave — four symmetric corner fans of `kLine` strokes; `step` = line interval 1–25 (default 5, smaller = tighter weave) |
-
+| `fpdemo.tsk` | `run fpdemo` | The `fp.lib` showcase: a sine wave edge to edge with a cosine wave superimposed, computed **pixel by pixel** (`FSIN`/`FCOS`) and plotted with `kPlot`; peaks/troughs touch the top and bottom of the screen. Slow by design (yields every pixel), then idles with the bitmap on screen |
 ## `.lib` shared libraries
 
 Loaded into the pool on demand by the kernel and freed at refcount 0 — see
@@ -76,7 +76,8 @@ Loaded into the pool on demand by the kernel and freed at refcount 0 — see
 |---|---|---|
 | `time.lib` | `clock`, `time` | getTime / setTime / printTime |
 | `fswrite.lib` | shell, `basic`, `format`, `rename` | format / save / delete / rename |
-| `gfx.lib` | `gfxdemo` | plot / line / box / fillBox / clearBitmap + 5 stubs |
+| `gfx.lib` | `gfxdemo`, `fpdemo` | plot / line / box / fillBox / clearBitmap + 5 stubs |
+| `fp.lib` | `basic`, `fpdemo` | EhBASIC floating-point core: 26-opcode `fpExec` dispatcher (add/sub/mul/div/pow/trig/log/exp/rnd/conversions/…) |
 
 ## Fonts, banners and batch files
 

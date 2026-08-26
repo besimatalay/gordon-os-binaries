@@ -117,7 +117,7 @@ until you export them. Before powering down:
 
 ## Quick start
 
-See the quick-start guide (`quickstart.binaries.md`) for what you can do once
+See the [quick-start guide](quickstart.binaries.md) for what you can do once
 the shell boots.
 
 ## License / Notice

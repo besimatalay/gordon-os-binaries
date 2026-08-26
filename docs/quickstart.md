@@ -26,6 +26,7 @@ The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-ru
 | `save <name> <start> <end>` | Save a memory block to the REU FS |
 | `load <name> <addr>` | Load a file from the REU FS into memory |
 | `del <name>` | Delete an REU FS file |
+| `wait` | Print "press any key to continue..." and wait for a keypress |
 
 ## `.com` command tasks
 
@@ -35,7 +36,7 @@ All 12 are bundled in the REU image:
 | File | Usage | What it does |
 |---|---|---|
 | `ps.com` | `ps` | List tasks: `id pri addr size name` per ALIVE task |
-| `dir.com` | `dir` | List REU FS files: name + size, footer `N file(s) $xxxx free` |
+| `dir.com` | `dir [/w\|/p] [pattern]` | List REU FS files: name + size, footer `N file(s) $xxxx free`. `/w` = two columns per line, `/p` = pause every 24 lines, `pattern` = wildcard filter (`*` any run, `?` any single character) — e.g. `dir *.com` or `dir /w *.tsk` |
 | `time.com` | `time [hhmmss [am\|pm]]` | Show the clock, or set it |
 | `kill.com` | `kill <id>` | Kill a task |
 | `pause.com` | `pause <id>` | Pause a task |

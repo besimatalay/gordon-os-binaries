@@ -21,7 +21,7 @@ Fully relocatable, reentrant and re-runnable tasks are a major feature: the
 same binary can be loaded into multiple instances at any free address
 (reentrant shares one code copy; re-runnable loads a fresh copy per `run`).
 The system supports up to 24 concurrent tasks, each with its own full 256-byte
-stack and a preserved zero-page region. Cold kernel code (time/fswrite/gfx/fp)
+stack and a preserved zero-page region. Cold kernel code (time/fswrite/gfx/fp/string)
 ships as shared `.lib` binaries loaded on demand.
 
 Key features:
@@ -31,7 +31,7 @@ Key features:
 - Dynamic task loader - `run <name>` loads relocatable + reentrant +
   re-runnable task binaries from the REU filesystem at runtime, with pool
   eviction when the pool is full
-- Dynamic kernel libraries - shared `.lib` binaries (time/fswrite/gfx/fp) loaded
+- Dynamic kernel libraries - shared `.lib` binaries (time/fswrite/gfx/fp/string) loaded
   on demand
 - Generic kernel heap - task-owned memory blocks preserved across eviction;
   `run basic <N>` sizes BASIC's program RAM, `pool` shows the pool map
@@ -44,8 +44,9 @@ Key features:
   stack, saved/restored by DMA
 - Per-task ZP preservation - tasks can preserve their own zero-page (ZP)
   memory across context switches
-- Bitmap graphics - REU-backed hires bitmap surfaces (28 slots), text/bitmap
-  coexistence via char shadows
+- Bitmap graphics - REU-backed bitmap surfaces (28 slots) in hires (320x200)
+  and multicolor (160x200); `gfx.lib` draws lines/boxes/circles/flood-fill and
+  pixel-positioned text, all MC-aware
 - Thread support - tasks can spawn child threads that share the parent's memory
 - REU filesystem - `format`/`save`/`load`/`del`/`rename`/`dir`/`type`/`fsinfo`, persists across reboots
 - IRQ-driven keyboard - 16-byte ring buffer, key repeat, F-key screen switching

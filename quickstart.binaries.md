@@ -65,15 +65,16 @@ All 9 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | `fpdemo.tsk` | `run fpdemo` | Floating-point showcase: a sine wave drawn edge to edge with a cosine wave superimposed, computed pixel by pixel; peaks and troughs touch the top and bottom of the screen. Slow by design, then idles with the finished bitmap on screen |
 ## `.lib` shared libraries
 
-These four library files are bundled in the REU image and are loaded
+These five library files are bundled in the REU image and are loaded
 automatically when a task needs them:
 
 | File | Used by | Provides |
 |---|---|---|
 | `time.lib` | `clock`, `time` | Clock reading and printing |
 | `fswrite.lib` | shell, `basic`, `format`, `rename` | Filesystem format/save/delete/rename |
-| `gfx.lib` | `gfxdemo`, `fpdemo` | Bitmap drawing |
+| `gfx.lib` | `gfxdemo`, `fpdemo` | Bitmap drawing + pixel-positioned text (hires + multicolor) |
 | `fp.lib` | `basic`, `fpdemo` | Floating-point math |
+| `string.lib` | shell, `dir`, `ps`, `time.lib`, `fswrite.lib` | String ops + hex formatting (`kStrlen`/`kStrcpy`/`kStrcmp`/`kSkipSpaces`/`kByteToHex`/`kHexDigit`/`kNibbleToHex`) |
 
 ## Fonts, banners and batch files
 

@@ -55,7 +55,7 @@ All 9 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | File | Run with | What it does |
 |---|---|---|
 | `shell.tsk` | `run shell` | The interactive shell itself. This is a re-entrant task that is started automatically when the system boots, but you can also run multiple copies of it if you wish |
-| `basic.tsk` | `run basic <N>` | Gordon BASIC interpreter (EhBASIC) + line editor; N = program-RAM pages (256B each) |
+| `basic.tsk` | `run basic <N>` | Gordon BASIC interpreter (EhBASIC) + line editor + bitmap-graphics commands (`MODE`/`PEN0`–`PEN3`/`PLOT`/`CIRCLE`/…); N = program-RAM pages (256B each) |
 | `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor; opens the file or starts blank (terminate with `kill edit`) |
 | `border.tsk` | `run border` | Border color flash demo |
 | `maze.tsk` | `run maze` | Animated 10 PRINT maze renderer |
@@ -72,7 +72,7 @@ automatically when a task needs them:
 |---|---|---|
 | `time.lib` | `clock`, `time` | Clock reading and printing |
 | `fswrite.lib` | shell, `basic`, `format`, `rename` | Filesystem format/save/delete/rename |
-| `gfx.lib` | `gfxdemo`, `fpdemo` | Bitmap drawing + pixel-positioned text (hires + multicolor) |
+| `gfx.lib` | `gfxdemo`, `fpdemo`, `basic` | Bitmap drawing + pixel-positioned text + matrix fill (hires + multicolor) |
 | `fp.lib` | `basic`, `fpdemo` | Floating-point math |
 | `string.lib` | shell, `dir`, `ps`, `time.lib`, `fswrite.lib` | String ops + hex formatting (`kStrlen`/`kStrcpy`/`kStrcmp`/`kSkipSpaces`/`kByteToHex`/`kHexDigit`/`kNibbleToHex`) |
 

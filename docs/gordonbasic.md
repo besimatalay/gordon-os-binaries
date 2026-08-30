@@ -41,6 +41,11 @@ GordonOS):
 
 - `DIR` — list the REU filesystem.
 - `EXIT` — leave BASIC and return to the shell.
+- A full **bitmap graphics** command set: `MODE`, `PEN0`–`PEN3`, `CLS`,
+  `PLOT`, `LINE`, `BOX`, `FILLBOX`, `CIRCLE`, `ELLIPSE`, `FLOOD`,
+  `GCHAR`, `GTEXT`, `PRINTAT`, `LOCATE`, `COLOUR`, `BORDER`, `SCROLL`,
+  `SCROLLBY`, `SHADOW`, `GDEF`, `GLYPH`, `SETFONT`, and the
+  `GETPIXEL()` function — documented in [Graphics](#graphics).
 
 **Changed:**
 
@@ -114,6 +119,9 @@ PI    POKE  POS   PRINT READ  REM   RESTORE RETURN RIGHT$ RND
 RUN   SADD  SAVE  SGN   SIN   SPC(  SQR   STEP  STOP  STR$
 SWAP  TAB(  TAN   THEN  TO    UCASE$ UNTIL VAL  VARPTR WAIT
 WHILE WIDTH
+BORDER BOX   CIRCLE CLS   COLOUR CURSOR ELLIPSE FILLBOX FLOOD
+GCHAR  GDEF  GETPIXEL GLYPH GTEXT LINE LOCATE MODE PEN0 PEN1
+PEN2   PEN3  PLOT  PRINTAT SCROLL SCROLLBY SETFONT SHADOW
 +  -  *  /  ^  <<  >>  <  <=  =  >=  >  <>
 ```
 
@@ -350,6 +358,109 @@ DIR              ← lists the filesystem
 
 Files persist across reboots; you can also see and manage them from the
 shell with `dir`, `del`, `save`, and `load`.
+
+---
+
+## Graphics
+
+Gordon Basic adds a bitmap-graphics command set that draws straight into
+the task's screen. Every surface is a 320×200 bitmap; the commands below
+select the drawing mode, set the palette, or draw primitives.
+
+### Graphics modes
+
+`MODE n` selects the pixel mode. Colours are preserved across the switch.
+
+| Mode | Resolution | Bits/pixel | Pixel value |
+|---|---|---|---|
+| `MODE 0` (hires) | 320 × 200 | 1 | 0 = clear, 1 = set |
+| `MODE 1` (multicolor) | 160 × 200 | 2 | 0–3 |
+
+### Colour model
+
+Every 8×8 cell has a matrix byte at `$0400`; its two 4-bit nibbles plus
+`$D021` and colour RAM (`$D800`) provide the palette:
+
+| Pixel value | Source | Set by |
+|---|---|---|
+| `0` | `$D021` (background 0) — multicolor only | `PEN0` |
+| `1` | video-matrix **high** nibble | `PEN1` |
+| `2` | video-matrix **low** nibble | `PEN2` |
+| `3` | colour RAM (`$D800`) — multicolor only | `PEN3` |
+
+- **Hires** uses only the matrix nibbles: a set pixel (`1`) shows the high
+  nibble, a clear pixel (`0`) shows the low nibble.
+- **Multicolor** uses all four sources; the 2-bit value written by the
+  drawing commands picks one of the four.
+
+So `PEN0`…`PEN3` set the colours of pixel values `0`…`3`, and the drawing
+commands take that value as their final `c` argument.
+
+### Palette commands
+
+- `PEN0 c` — colour of MC pixel value `0` (`$D021`). No effect in hires.
+- `PEN1 c` — colour of value `1` (matrix high nibble). In hires this is the
+  foreground (set-pixel) colour.
+- `PEN2 c` — colour of value `2` (matrix low nibble). In hires this is the
+  background (clear-pixel) colour.
+- `PEN3 c` — colour of value `3` (colour RAM). No effect in hires.
+- `COLOUR c` — set the text colour (also used by `CLS` when refilling the
+  matrix). Does not repaint the whole screen; `PEN1` does.
+- `BORDER c` — set the border colour (`$D020`).
+
+### Drawing commands
+
+Coordinates: `x` is 0–319 in hires and 0–159 in multicolor; `y` is 0–199
+in both. The final `c` argument is the colour: in hires `0` clears and any
+non-zero value sets (the pixel then shows `PEN1`'s colour); in multicolor
+`c` is the 2-bit value `0–3`.
+
+- `PLOT x,y,c` — set/clear one pixel.
+- `LINE x1,y1,x2,y2,c` — line.
+- `BOX x,y,w,h,c` — rectangle outline.
+- `FILLBOX x,y,w,h,c` — filled rectangle.
+- `CIRCLE x,y,r,c` — circle outline.
+- `ELLIPSE cx,cy,rx,ry,c` — ellipse outline.
+- `FLOOD x,y,c` — flood fill starting at `(x,y)`.
+- `GETPIXEL(x,y)` — function: returns `0`/`1` in hires, `0`–`3` in
+  multicolor.
+
+### Text and glyph commands
+
+- `CLS` — clear the bitmap, home the cursor, and refill the matrix with
+  the `PEN1`/`PEN2` colours.
+- `LOCATE col,row` — move the text cursor (col 0–39, row 0–24).
+- `PRINTAT col,row,c,"str"` — print a string at a fixed cell position.
+- `GCHAR x,y,"ch",c` — draw one font glyph with its top-left corner at
+  pixel `(x,y)`.
+- `GTEXT x,y,c,"str"` — draw a string of glyphs at pixel `(x,y)`.
+- `GDEF n,b0,b1,…,b7` — define custom glyph `n` (0–15) from 8 rows.
+- `GLYPH n` — print custom glyph `n` at the text cursor.
+- `SETFONT "name"` — load `name.fnt` from the REU filesystem into the
+  font slot.
+
+### Cursor and scrolling
+
+- `CURSOR 0|1` — hide/show the text cursor.
+- `SHADOW 0|1` — disable/enable the char-shadow mirror (used by the line
+  editor).
+- `SCROLL top,bottom` — set the scroll region (inclusive rows) and move
+  the cursor to its top-left corner.
+- `SCROLLBY n` — scroll the current region by `n` rows.
+
+### Example
+
+```
+MODE 1
+PEN0 0                 ' value 0 = black
+PEN1 5                 ' value 1 = green
+PEN2 7                 ' value 2 = yellow
+PEN3 1                 ' value 3 = white
+CLS
+CIRCLE 40,100,30,1     ' green
+CIRCLE 80,100,30,2     ' yellow
+CIRCLE 120,100,30,3    ' white
+```
 
 ---
 

@@ -35,8 +35,9 @@ Key features:
   on demand
 - Generic kernel heap - task-owned memory blocks preserved across eviction;
   `run basic <N>` sizes BASIC's program RAM, `pool` shows the pool map
-- Gordon Basic (derived from EhBASIC) - full floating-point BASIC,
-  `run basic <N>` sizes the program RAM
+- Gordon Basic (derived from EhBASIC) - full floating-point BASIC with
+  bitmap-graphics commands (`MODE`/`PEN0`-`PEN3`/`PLOT`/`LINE`/`BOX`/`CIRCLE`/
+  `ELLIPSE`/`FLOOD`/`GCHAR`/`GTEXT`/…), `run basic <N>` sizes the program RAM
 - Shared floating-point library - `fp.lib` (the EhBASIC FP core) consumed
   by BASIC and the `fpdemo` task, which draws a sine + cosine wave pixel by
   pixel across the full bitmap

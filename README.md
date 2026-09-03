@@ -21,7 +21,7 @@ Fully relocatable, reentrant and re-runnable tasks are a major feature: the
 same binary can be loaded into multiple instances at any free address
 (reentrant shares one code copy; re-runnable loads a fresh copy per `run`).
 The system supports up to 24 concurrent tasks, each with its own full 256-byte
-stack and a preserved zero-page region. Cold kernel code (time/fswrite/gfx/fp/string)
+stack and a preserved zero-page region. Cold kernel code (time/filesys/gfx/fp/string)
 ships as shared `.lib` binaries loaded on demand.
 
 Key features:
@@ -31,13 +31,16 @@ Key features:
 - Dynamic task loader - `run <name>` loads relocatable + reentrant +
   re-runnable task binaries from the REU filesystem at runtime, with pool
   eviction when the pool is full
-- Dynamic kernel libraries - shared `.lib` binaries (time/fswrite/gfx/fp/string) loaded
+- Dynamic kernel libraries - shared `.lib` binaries (time/filesys/gfx/fp/string) loaded
   on demand
 - Generic kernel heap - task-owned memory blocks preserved across eviction;
-  `run basic <N>` sizes BASIC's program RAM, `pool` shows the pool map
+  `pool` shows the pool map
 - Gordon Basic (derived from EhBASIC) - full floating-point BASIC with
   bitmap-graphics commands (`MODE`/`PEN0`-`PEN3`/`PLOT`/`LINE`/`BOX`/`CIRCLE`/
-  `ELLIPSE`/`FLOOD`/`GCHAR`/`GTEXT`/…), `run basic <N>` sizes the program RAM
+  `ELLIPSE`/`FLOOD`/`GCHAR`/`GTEXT`/…), a persistent 64 KB REU working file
+  `basicwrk` opened with `run basic` (reused if present, created if absent,
+  deleted on `EXIT`), with `SAVE`/`LOAD`
+  to `.bas` files
 - Shared floating-point library - `fp.lib` (the EhBASIC FP core) consumed
   by BASIC and the `fpdemo` task, which draws a sine + cosine wave pixel by
   pixel across the full bitmap

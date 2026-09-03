@@ -4,8 +4,9 @@ After boot you land in the shell (a blinking block cursor). The shell is
 itself a dynamic task (`shell.tsk`) loaded from the REU filesystem by the
 boot task.
 
-BASIC's program RAM is a memory block sized with `run basic <N>`
-(256-byte pages).
+BASIC's program RAM is a persistent 64 KB REU working file (`basicwrk`) —
+open it with `run basic` (reused if present, created if absent, deleted on
+`EXIT`).
 
 The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-runnable**:
 `run` them multiple times for a fresh copy each time.
@@ -18,7 +19,7 @@ The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-ru
 | `clear` | Clear the shell's screen |
 | `view <id>` | Switch the display to a task's screen |
 | `exit` | Exit the shell |
-| `run <file> [pages]` | Load + run a `.tsk` task from the REU FS (foreground) |
+| `run <file> [args]` | Load + run a `.tsk` task from the REU FS (foreground) |
 | `pool` | Print the task-pool map (pages, owners, sizes) |
 | `runbatch <file>` | Run a `.bat` batch script from the REU FS |
 | `print <text>` | Print text |
@@ -55,7 +56,7 @@ All 9 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | File | Run with | What it does |
 |---|---|---|
 | `shell.tsk` | `run shell` | The interactive shell itself. This is a re-entrant task that is started automatically when the system boots, but you can also run multiple copies of it if you wish |
-| `basic.tsk` | `run basic <N>` | Gordon BASIC interpreter (EhBASIC) + line editor + bitmap-graphics commands (`MODE`/`PEN0`–`PEN3`/`PLOT`/`CIRCLE`/…); N = program-RAM pages (256B each) |
+| `basic.tsk` | `run basic` | Gordon BASIC interpreter (EhBASIC) + line editor + bitmap-graphics commands (`MODE`/`PEN0`–`PEN3`/`PLOT`/`CIRCLE`/…); opens the persistent REU working file `basicwrk` (reused if present, created if absent, deleted on `EXIT`) |
 | `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor; opens the file or starts blank (terminate with `kill edit`) |
 | `border.tsk` | `run border` | Border color flash demo |
 | `maze.tsk` | `run maze` | Animated 10 PRINT maze renderer |
@@ -71,10 +72,10 @@ automatically when a task needs them:
 | File | Used by | Provides |
 |---|---|---|
 | `time.lib` | `clock`, `time` | Clock reading and printing |
-| `fswrite.lib` | shell, `basic`, `format`, `rename` | Filesystem format/save/delete/rename |
+| `filesys.lib` | shell, `basic`, `format`, `rename` | Filesystem format/save/delete/rename + in-place create/open/readAt/writeAt |
 | `gfx.lib` | `gfxdemo`, `fpdemo`, `basic` | Bitmap drawing + pixel-positioned text + matrix fill (hires + multicolor) |
 | `fp.lib` | `basic`, `fpdemo` | Floating-point math |
-| `string.lib` | shell, `dir`, `ps`, `time.lib`, `fswrite.lib` | String ops + hex formatting (`kStrlen`/`kStrcpy`/`kStrcmp`/`kSkipSpaces`/`kByteToHex`/`kHexDigit`/`kNibbleToHex`) |
+| `string.lib` | shell, `dir`, `ps`, `time.lib`, `filesys.lib` | String ops + hex formatting (`kStrlen`/`kStrcpy`/`kStrcmp`/`kSkipSpaces`/`kByteToHex`/`kHexDigit`/`kNibbleToHex`) |
 
 ## Fonts, banners and batch files
 

@@ -4,10 +4,11 @@
 
 Gordon Basic is a full floating-point Microsoft BASIC 2.0-compatible
 interpreter that runs as a **task** on GordonOS. It is loaded on demand
-from the REU filesystem with `run basic` and runs on its own screen with
-case-preserving input, RUN/STOP-to-break, and C64 screen-editor-style line
-editing. Programs live in runtime-sized program RAM (a `kMalloc` block
-sized at launch).
+from the REU filesystem with `run basic` and runs on its own
+screen with case-preserving input, RUN/STOP-to-break, and C64
+screen-editor-style line editing. Programs live in a persistent REU-backed
+working file (`basicwrk`) — reused if present, created if absent, and
+deleted when BASIC exits normally.
 
 ## Provenance
 
@@ -246,13 +247,13 @@ Waits until `(PEEK(addr) EOR b2) AND b1` is non-zero. `b2` defaults to 0.
 
 ### `LOAD "<name>"`
 
-Loads a previously saved program from the REU filesystem and warm-starts
-BASIC. See *Filesystem commands* below.
+Imports a previously saved `.bas` program from the REU filesystem into the
+current working file and warm-starts BASIC. See *Filesystem commands* below.
 
 ### `SAVE "<name>"`
 
-Saves the current program to the REU filesystem. See *Filesystem
-commands* below.
+Exports the current working-file program to the REU filesystem. See
+*Filesystem commands* below.
 
 ### `DEF FN <name>(<var>) = <statement>`
 
@@ -336,12 +337,12 @@ LOOP`, `DEF`).
 
 ## Filesystem commands (`DIR`, `SAVE`, `LOAD`)
 
-`SAVE` and `LOAD` store programs in the GordonOS REU filesystem as files
-with a `.bas` extension.
+`SAVE` and `LOAD` exchange programs between BASIC's current REU working file
+and normal GordonOS filesystem entries with a `.bas` extension.
 
 ```
-SAVE "prog"      ← saves the program as prog.bas
-LOAD "prog"      ← loads prog.bas and warm-starts (prints ready)
+SAVE "prog"      ← exports the current program as prog.bas
+LOAD "prog"      ← imports prog.bas and warm-starts (prints ready)
 DIR              ← lists the filesystem
 ```
 
@@ -436,8 +437,9 @@ non-zero value sets (the pixel then shows `PEN1`'s colour); in multicolor
 - `GTEXT x,y,c,"str"` — draw a string of glyphs at pixel `(x,y)`.
 - `GDEF n,b0,b1,…,b7` — define custom glyph `n` (0–15) from 8 rows.
 - `GLYPH n` — print custom glyph `n` at the text cursor.
-- `SETFONT "name"` — load `name.fnt` from the REU filesystem into the
-  font slot.
+- `SETFONT "name"` — switch the system font to `name.fnt` from the
+  REU filesystem (REU-only font: updates the kernel's font record; the
+  2 KB file stays in the REU FS and the blitter DMA's glyphs on demand).
 
 ### Cursor and scrolling
 
@@ -551,14 +553,17 @@ where `n` is the line number.
 From the shell:
 
 ```
-run basic <pages>  ← launch BASIC with <pages> × 256B of program RAM
-                     (required — e.g. `run basic 40` = 10 KB; no default)
+run basic          ← launch BASIC using the REU working file basicwrk
 view basic         ← switch back to BASIC's screen (after run basic)
 ```
 
-- Program RAM is a `kMalloc` block sized at launch (`run basic 40` =
-  10 KB; page size is 256B, configurable via `pool.inc`). `FRE(0)` reports
-  the size of that run.
+- Program text, variables, arrays, and strings live in BASIC's REU working
+  file `basicwrk`. `FRE(0)` runs garbage collection and reports the free
+  gap in that working file.
+- `run basic` reuses `basicwrk` when it exists, otherwise creates it; the
+  file is deleted when BASIC exits, so a crashed session's program survives
+  into the next run.
+- BASIC is single-instance (`run basic` twice → `? already running`).
 - **`pool`** (shell command) lists pool allocations and their owners.
 
 - **`RUN/STOP`** breaks a running program (CTRL-C equivalent).

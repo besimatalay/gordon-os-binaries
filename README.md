@@ -40,7 +40,7 @@ Key features:
   `ELLIPSE`/`FLOOD`/`GCHAR`/`GTEXT`/…), a persistent 64 KB REU working file
   `basicwrk` opened with `run basic` (reused if present, created if absent,
   deleted on `EXIT`), with `SAVE`/`LOAD`
-  to `.bas` files
+  to `.bas` files — see the [Gordon Basic language reference](docs/gordonbasic.md)
 - Shared floating-point library - `fp.lib` (the EhBASIC FP core) consumed
   by BASIC and the `fpdemo` task, which draws a sine + cosine wave pixel by
   pixel across the full bitmap

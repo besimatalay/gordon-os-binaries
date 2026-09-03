@@ -6,7 +6,7 @@ boot task.
 
 BASIC's program RAM is a persistent 64 KB REU working file (`basicwrk`) —
 open it with `run basic` (reused if present, created if absent, deleted on
-`EXIT`).
+`exit`).
 
 The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-runnable**:
 `run` them multiple times for a fresh copy each time.
@@ -56,7 +56,7 @@ All 9 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | File | Run with | What it does |
 |---|---|---|
 | `shell.tsk` | `run shell` | The interactive shell itself. This is a re-entrant task that is started automatically when the system boots, but you can also run multiple copies of it if you wish |
-| `basic.tsk` | `run basic` | Gordon BASIC interpreter (EhBASIC) + line editor + bitmap-graphics commands (`MODE`/`PEN0`–`PEN3`/`PLOT`/`CIRCLE`/…); opens the persistent REU working file `basicwrk` (reused if present, created if absent, deleted on `EXIT`). See the [Gordon Basic language reference](docs/gordonbasic.md) |
+| `basic.tsk` | `run basic` | Gordon BASIC interpreter (EhBASIC) + line editor + bitmap-graphics commands (`mode`/`pen0`–`pen3`/`plot`/`circle`/…); opens the persistent REU working file `basicwrk` (reused if present, created if absent, deleted on `exit`). See the [Gordon Basic language reference](docs/gordonbasic.md) |
 | `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor; opens the file or starts blank (terminate with `kill edit`) |
 | `border.tsk` | `run border` | Border color flash demo |
 | `maze.tsk` | `run maze` | Animated 10 PRINT maze renderer |

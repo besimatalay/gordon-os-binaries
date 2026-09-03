@@ -36,10 +36,10 @@ Key features:
 - Generic kernel heap - task-owned memory blocks preserved across eviction;
   `pool` shows the pool map
 - Gordon Basic (derived from EhBASIC) - full floating-point BASIC with
-  bitmap-graphics commands (`MODE`/`PEN0`-`PEN3`/`PLOT`/`LINE`/`BOX`/`CIRCLE`/
-  `ELLIPSE`/`FLOOD`/`GCHAR`/`GTEXT`/…), a persistent 64 KB REU working file
+  bitmap-graphics commands (`mode`/`pen0`-`pen3`/`plot`/`line`/`box`/`circle`/
+  `ellipse`/`flood`/`gchar`/`gtext`/…), a persistent 64 KB REU working file
   `basicwrk` opened with `run basic` (reused if present, created if absent,
-  deleted on `EXIT`), with `SAVE`/`LOAD`
+  deleted on `exit`), with `save`/`load`
   to `.bas` files — see the [Gordon Basic language reference](docs/gordonbasic.md)
 - Shared floating-point library - `fp.lib` (the EhBASIC FP core) consumed
   by BASIC and the `fpdemo` task, which draws a sine + cosine wave pixel by

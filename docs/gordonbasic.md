@@ -554,7 +554,6 @@ From the shell:
 
 ```
 run basic          ← launch BASIC using the REU working file basicwrk
-view basic         ← switch back to BASIC's screen (after run basic)
 ```
 
 - Program text, variables, arrays, and strings live in BASIC's REU working
@@ -568,8 +567,6 @@ view basic         ← switch back to BASIC's screen (after run basic)
 
 - **`RUN/STOP`** breaks a running program (CTRL-C equivalent).
 - **`DEL`** is backspace during line input.
-- **F-keys** switch screens between BASIC, the shell, and other tasks —
-  your session is preserved.
 - **`EXIT`** leaves BASIC; the loader restores any tasks that were evicted
   to make room for it.
 - **`DIR`**, **`SAVE`**, and **`LOAD`** use the REU filesystem; saved

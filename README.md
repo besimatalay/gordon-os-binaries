@@ -56,6 +56,9 @@ Key features:
 - IRQ-driven keyboard - 16-byte ring buffer, key repeat, F-key screen switching
 - Interactive shell - line editing, cursor keys, blinking cursor,
   custom-glyph `.bnr` banners (`banner <file> <row> <col>`)
+- Full-screen text editor - the `edit` task: 25×40, insert/overwrite modes,
+  two-way scrolling with content-aware cursor movement; the document grows on
+  the fly (24-line chunks are kMalloc'd/freed as you type, up to 192 lines)
 - Batch file support as .bat files
 - Dynamic loading of charsets as .fnt files
 ## Files

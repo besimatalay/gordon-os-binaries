@@ -32,7 +32,7 @@ The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-ru
 ## `.com` command tasks
 
 Each command runs on the shell's shared screen and exits when done.
-All 12 are bundled in the REU image:
+All 13 are bundled in the REU image:
 
 | File | Usage | What it does |
 |---|---|---|
@@ -47,6 +47,7 @@ All 12 are bundled in the REU image:
 | `type.com` | `type <file>` | Dump a file's raw bytes to the shell screen (e.g. `type boot.bat`) |
 | `setfont.com` | `setfont <name>` | Load `<name>.fnt` from the REU FS into `FONT_BASE` (switches the system font; base name ≤ 7 chars) |
 | `rename.com` | `rename <old> <new>` | Rename an REU FS file |
+| `copy.com` | `copy <src> <dst>` | Copy an REU FS file under a new name (streams through a 4-page C64 scratch buffer; destination must not already exist) |
 | `banner.com` | `banner <file> <row> <col>` | Draw a `.bnr` custom-glyph banner at (row, col) on the shell's screen (base name ≤ 7 chars) |
 
 ## `.tsk` task files
@@ -72,7 +73,7 @@ automatically when a task needs them:
 | File | Used by | Provides |
 |---|---|---|
 | `time.lib` | `clock`, `time` | Clock reading and printing |
-| `filesys.lib` | shell, `basic`, `format`, `rename` | Filesystem format/save/delete/rename + in-place create/open/readAt/writeAt |
+| `filesys.lib` | shell, `basic`, `format`, `rename`, `copy` | Filesystem format/save/delete/rename + in-place create/open/readAt/writeAt |
 | `gfx.lib` | `gfxdemo`, `fpdemo`, `basic` | Bitmap drawing + pixel-positioned text + matrix fill (hires + multicolor) |
 | `fp.lib` | `basic`, `fpdemo` | Floating-point math |
 | `string.lib` | shell, `dir`, `ps`, `time.lib`, `filesys.lib` | String ops + hex formatting (`kStrlen`/`kStrcpy`/`kStrcmp`/`kSkipSpaces`/`kByteToHex`/`kHexDigit`/`kNibbleToHex`) |

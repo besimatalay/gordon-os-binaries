@@ -26,13 +26,12 @@ The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-ru
 | `fsinfo` | Show FS status (active, banks, size) |
 | `save <name> <start> <end>` | Save a memory block to the REU FS |
 | `load <name> <addr>` | Load a file from the REU FS into memory |
-| `del <name>` | Delete an REU FS file |
 | `wait` | Print "press any key to continue..." and wait for a keypress |
 
 ## `.com` command tasks
 
 Each command runs on the shell's shared screen and exits when done.
-All 13 are bundled in the REU image:
+All 14 are bundled in the REU image:
 
 | File | Usage | What it does |
 |---|---|---|
@@ -48,6 +47,7 @@ All 13 are bundled in the REU image:
 | `setfont.com` | `setfont <name>` | Load `<name>.fnt` from the REU FS into `FONT_BASE` (switches the system font; base name ≤ 7 chars) |
 | `rename.com` | `rename <old> <new>` | Rename an REU FS file |
 | `copy.com` | `copy <src> <dst>` | Copy an REU FS file under a new name (streams through a 4-page C64 scratch buffer; destination must not already exist) |
+| `del.com` | `del <pattern>` | Delete every REU FS file matching a wildcard pattern (`*` any run, `?` any single char); a plain name deletes exactly that file |
 | `banner.com` | `banner <file> <row> <col>` | Draw a `.bnr` custom-glyph banner at (row, col) on the shell's screen (base name ≤ 7 chars) |
 
 ## `.tsk` task files

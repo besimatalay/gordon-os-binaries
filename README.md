@@ -131,7 +131,13 @@ the shell boots.
 ## License / Notice
 
 GordonOS is licensed under the GNU GPL v2 or later - see `LICENSE.md`.
-Third-party notices (EhBASIC, filesystem code) are in `NOTICE`.
+Third-party notices (EhBASIC, filesystem code, and the Enhanced SID
+Player used by the `sidplay` task) are in `NOTICE`.
+
+The `sidplay` player routine is a port of COMPUTE!'s Enhanced SID
+Player (Craig Chamberlain, 1986) as disassembled by Chris Zinn (2025).
+Neither the original nor the disassembly carries an explicit license —
+see `NOTICE` before redistributing.
 
 ## Contact
 

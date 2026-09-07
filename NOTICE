@@ -32,3 +32,21 @@ Lee Davison's code is free but not copyright free; distribution of
 derivative works is permitted for non commercial use.
 
 For commercial use please contact Lee Davison for conditions.
+
+Enhanced SID Player (.mus player)
+---------------------------------
+The `sidplay` task (`src/tasks/dynamic/sidplay.inc`) is a port of the
+Enhanced SID Player player routine.
+
+Original: "Enhanced SID Player" by Craig Chamberlain (1986), published
+in "COMPUTE!'s Music System for the C64 and C128" (COMPUTE!
+Publications).
+
+Disassembly: "ComputeSidPlayerC64Source" by Chris Zinn
+(October-November 2025):
+https://github.com/MyDeveloperThoughts/ComputeSidPlayerC64Source
+
+Neither the 1986 original nor the 2025 disassembly carries an explicit
+license. This component is included as a user-loadable music player;
+redistribution is at the user's own discretion with respect to this
+component.

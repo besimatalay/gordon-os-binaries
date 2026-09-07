@@ -31,7 +31,7 @@ The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-ru
 ## `.com` command tasks
 
 Each command runs on the shell's shared screen and exits when done.
-All 14 are bundled in the REU image:
+All 17 are bundled in the REU image:
 
 | File | Usage | What it does |
 |---|---|---|
@@ -49,10 +49,13 @@ All 14 are bundled in the REU image:
 | `copy.com` | `copy <src> <dst>` | Copy an REU FS file under a new name (streams through a 4-page C64 scratch buffer; destination must not already exist) |
 | `del.com` | `del <pattern>` | Delete every REU FS file matching a wildcard pattern (`*` any run, `?` any single char); a plain name deletes exactly that file |
 | `banner.com` | `banner <file> <row> <col>` | Draw a `.bnr` custom-glyph banner at (row, col) on the shell's screen (base name ≤ 7 chars) |
+| `sidrst.com` | `sidrst` | Reset the SID chip (zeroes `$D400`–`$D418`) — silences a stuck note left by a killed `sidplay` |
+| `blink.com` | `blink <n>` | Set the cursor blink interval to `n` ticks (default 30, ~60 Hz) |
+| `keyrpt.com` | `keyrpt <delay> <repeat>` | Set keyboard repeat timing: `delay` ticks before the first repeat (default 30), then `repeat` ticks between repeats (default 6) |
 
 ## `.tsk` task files
 
-All 9 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
+All 10 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 
 | File | Run with | What it does |
 |---|---|---|
@@ -65,6 +68,7 @@ All 9 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | `threads.tsk` | `run threads` | Thread demo — spawns two child threads (border inc/dec) |
 | `gfxdemo.tsk` | `run gfxdemo [step]` | Spider-web line weave — four symmetric corner fans of lines; `step` = line interval 1–25 (default 5, smaller = tighter weave) |
 | `fpdemo.tsk` | `run fpdemo` | Floating-point showcase: a sine wave drawn edge to edge with a cosine wave superimposed, computed pixel by pixel; peaks and troughs touch the top and bottom of the screen. Slow by design, then idles with the finished bitmap on screen |
+| `sidplay.tsk` | `run sidplay <name> [delay]` | Plays a COMPUTE!'s Enhanced Sidplayer `.mus` song (`commodo`, `fsonata` bundled) — single-instance, no screen, exits when the song ends; `delay` = ticks per jiffy (default 1, raise to slow down) |
 ## `.lib` shared libraries
 
 These five library files are bundled in the REU image and are loaded

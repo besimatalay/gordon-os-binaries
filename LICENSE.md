@@ -20,8 +20,16 @@ Distributed under Lee Davison's terms: free for non-commercial use;
 any derivative work must include the string "Derived from EhBASIC"
 in binary distributions. See `NOTICE` file for details.
 
+**Enhanced SID Player (.mus player)** — the `sidplay` task
+(`src/tasks/dynamic/sidplay.inc`). Original by Craig Chamberlain
+(1986), published in *COMPUTE!'s Music System for the C64 and C128*
+(COMPUTE! Publications); disassembled by Chris Zinn (2025) in the
+`ComputeSidPlayerC64Source` repository. Neither the original nor the
+disassembly carries an explicit license. See `NOTICE` for details.
+
 All original GordonOS code remains under GPL-2.0. EhBASIC is included
-under its original author's terms.
+under its original author's terms; the Enhanced SID Player is included
+with no explicit license (see `NOTICE`).
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

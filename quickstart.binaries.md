@@ -31,7 +31,7 @@ The `.tsk` tasks `gfxdemo`, `fpdemo`, `border`, `maze` and `threads` are **re-ru
 ## `.com` command tasks
 
 Each command runs on the shell's shared screen and exits when done.
-All 17 are bundled in the REU image:
+All 18 are bundled in the REU image:
 
 | File | Usage | What it does |
 |---|---|---|
@@ -48,6 +48,7 @@ All 17 are bundled in the REU image:
 | `rename.com` | `rename <old> <new>` | Rename an REU FS file |
 | `copy.com` | `copy <src> <dst>` | Copy an REU FS file under a new name (streams through a 4-page C64 scratch buffer; destination must not already exist) |
 | `del.com` | `del <pattern>` | Delete every REU FS file matching a wildcard pattern (`*` any run, `?` any single char); a plain name deletes exactly that file |
+| `compact.com` | `compact` | Reclaim REU FS space. `del` only tombstones a file — its bytes and its directory slot leak permanently — so `compact` packs the live files down to the front, frees the tombstone slots and resets the allocator so the free-space figure `dir` shows is accurate. Refuses to run while any other task is alive: it prints `? busy - N task(s) must be killed` and lists them (kill them first — a task saving mid-compaction would be overwritten). Can take a few seconds; nothing is erased |
 | `banner.com` | `banner <file> <row> <col>` | Draw a `.bnr` custom-glyph banner at (row, col) on the shell's screen (base name ≤ 7 chars) |
 | `sidrst.com` | `sidrst` | Reset the SID chip (zeroes `$D400`–`$D418`) — silences a stuck note left by a killed `sidplay` |
 | `blink.com` | `blink <n>` | Set the cursor blink interval to `n` ticks (default 30, ~60 Hz) |
@@ -61,7 +62,7 @@ All 10 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 |---|---|---|
 | `shell.tsk` | `run shell` | The interactive shell itself. This is a re-entrant task that is started automatically when the system boots, but you can also run multiple copies of it if you wish |
 | `basic.tsk` | `run basic` | Gordon BASIC interpreter (EhBASIC) + line editor + bitmap-graphics commands (`mode`/`pen0`–`pen3`/`plot`/`circle`/…); opens the persistent REU working file `basicwrk` (reused if present, created if absent, deleted on `exit`). See the [Gordon Basic language reference](docs/gordonbasic.md) |
-| `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor: opens the file or starts blank; the document grows on the fly (24-line chunks are kMalloc'd/freed as you type, up to 192 lines), two-way scrolling, insert/overwrite modes, saves back to the same file |
+| `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor: opens the file or starts blank; the document grows on the fly (24-line chunks are kMalloc'd/freed as you type, up to 192 lines), two-way scrolling, insert/overwrite modes, saves back to the same file. `STOP+M` marks a selection (cursor keys extend it, highlighted in reverse video); `STOP+Y` copies it, `STOP+K` cuts it, `STOP+P` pastes the clipboard at the cursor |
 | `border.tsk` | `run border` | Border color flash demo |
 | `maze.tsk` | `run maze` | Animated 10 PRINT maze renderer |
 | `clock.tsk` | `run clock` | Real-time clock at (0,0) on the shared screen |

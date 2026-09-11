@@ -52,13 +52,16 @@ Key features:
   and multicolor (160x200); `gfx.lib` draws lines/boxes/circles/flood-fill and
   pixel-positioned text, all MC-aware
 - Thread support - tasks can spawn child threads that share the parent's memory
-- REU filesystem - `format`/`save`/`load`/`del`/`rename`/`copy`/`dir`/`type`/`fsinfo`, persists across reboots
+- REU filesystem - `format`/`save`/`load`/`del`/`rename`/`copy`/`dir`/`type`/`fsinfo`/`compact`, persists across reboots
 - IRQ-driven keyboard - 16-byte ring buffer, key repeat, F-key screen switching
 - Interactive shell - line editing, cursor keys, blinking cursor,
   custom-glyph `.bnr` banners (`banner <file> <row> <col>`)
 - Full-screen text editor - the `edit` task: 25×40, insert/overwrite modes,
   two-way scrolling with content-aware cursor movement; the document grows on
-  the fly (24-line chunks are kMalloc'd/freed as you type, up to 192 lines)
+  the fly (24-line chunks are kMalloc'd/freed as you type, up to 192 lines).
+  Region editing: `STOP+M` marks a selection (cursor keys extend it, drawn in
+  reverse video), `STOP+Y` copies it to an in-memory clipboard, `STOP+K` cuts
+  it, `STOP+P` pastes at the cursor
 - Batch file support as .bat files
 - Dynamic loading of charsets as .fnt files
 ## Files

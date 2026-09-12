@@ -21,7 +21,7 @@ any derivative work must include the string "Derived from EhBASIC"
 in binary distributions. See `NOTICE` file for details.
 
 **Enhanced SID Player (.mus player)** — the `sidplay` task
-(`src/tasks/dynamic/sidplay.inc`). Original by Craig Chamberlain
+(`src/libs/sidplay.inc`). Original by Craig Chamberlain
 (1986), published in *COMPUTE!'s Music System for the C64 and C128*
 (COMPUTE! Publications); disassembled by Chris Zinn (2025) in the
 `ComputeSidPlayerC64Source` repository. Neither the original nor the

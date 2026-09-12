@@ -35,7 +35,7 @@ For commercial use please contact Lee Davison for conditions.
 
 Enhanced SID Player (.mus player)
 ---------------------------------
-The `sidplay` task (`src/tasks/dynamic/sidplay.inc`) is a port of the
+The `sidplay` task (`src/libs/sidplay.inc`) is a port of the
 Enhanced SID Player player routine.
 
 Original: "Enhanced SID Player" by Craig Chamberlain (1986), published

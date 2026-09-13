@@ -17,6 +17,10 @@ and never swapped), and it prints `? sprites busy` and exits for any other owner
 runs, so a second `run godzi` gets `? already running` rather than two copies fighting
 over the SID; it also refuses with `? sprites busy` if another task is driving sprites,
 since its two switchable looks could not share them.
+`gortris` (Tetris) is **not re-runnable** either — it owns the display for its whole
+life, holds the board in its own image and plays its own music, so a second
+`run gortris` gets `? already running`. It is **pinned** in the pool as well
+(`KF_NOT_EVICTABLE`): swapping it out mid-game would have to restart the game cold.
 
 > ⚠️ **Only one task may drive the sprites at a time.** The register set is global (eight
 > art slots, one pointer table, per-slot bitmask bytes), so two concurrent sprite tasks
@@ -68,7 +72,7 @@ All 18 are bundled in the REU image:
 
 ## `.tsk` task files
 
-All 11 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
+All 13 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 
 | File | Run with | What it does |
 |---|---|---|
@@ -81,9 +85,11 @@ All 11 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | `threads.tsk` | `run threads` | Thread demo — spawns two child threads (border inc/dec) |
 | `gfxdemo.tsk` | `run gfxdemo [step]` | Spider-web line weave — four symmetric corner fans of lines; `step` = line interval 1–25 (default 5, smaller = tighter weave). `q` exits, while drawing or once idle |
 | `fpdemo.tsk` | `run fpdemo` | Floating-point showcase: a sine wave drawn edge to edge with a cosine wave superimposed, computed pixel by pixel; peaks and troughs touch the top and bottom of the screen. Slow by design, then idles with the finished bitmap on screen; `q` exits from either state |
-| `sidplay.tsk` | `run sidplay <name> [delay] [repeats]` | Plays a COMPUTE!'s Enhanced Sidplayer `.mus` song (`commodo`, `fsonata` bundled) through **`sid.lib`** — single-instance, no screen. `delay` = ticks per jiffy (default 1, raise to slow down), `repeats` = `0` forever / `1` once (default) / N plays. A failure prints `? tune <name>` / `? load <name>` / `? no memory` / `? no player` on a temporary screen and waits for a key. Also spawned by `godzi` (`sidplay commodo 2`), which restarts it when the song ends |
+| `sidplay.tsk` | `run sidplay <name> [delay] [repeats]` | Plays a COMPUTE!'s Enhanced Sidplayer `.mus` song (`commodo`, `fsonata`, `tetris` bundled) through **`sid.lib`** — single-instance, no screen. `delay` = ticks per jiffy (default 1, raise to slow down), `repeats` = `0` forever / `1` once (default) / N plays. A failure prints `? tune <name>` / `? load <name>` / `? no memory` / `? no player` on a temporary screen and waits for a key. Also spawned by `godzi` (`sidplay commodo 2`), which restarts it when the song ends |
 | `sprdemo.tsk` | `run sprdemo` | The sprite subsystem's demo: eight coloured balls bouncing off the walls and off each other, driven through the shadow API with one update per displayed frame. `q` exits (or `kill` it from the shell). No libraries; its only asset is `ball.spr`. **Re-runnable and guarded**: a second `sprdemo` is allowed because it shares the same sheet, but any other task holding the sprites makes it print `? sprites busy` and exit |
 | `godzi.tsk` | `run godzi [1\|2]` | A port of the stand-alone demo in `reference/godzi.asm`/`reference/main.asm`: a boat-shaped walker crosses the screen (its 9-bit x walks through x=256) while a "Godzilla" flaps between two poses. Four sprite slots — the reference's own layout: the walker's two overlapping layers (black rigging over a light-blue hull, an X-expanded pair) plus the two Godzilla poses — art in `boat.spr`/`godzi.spr`, no libraries, one update per displayed frame. Live keys: `1`/`2` switch between the two reference looks, `q` exits (or `kill` it from the shell). It has no sound of its own, so it spawns `sidplay` with the arguments a command line would use — `commodo 2` in mode 1, `fsonata 2` in mode 2 — and restarts it whenever the song ends; switching modes live switches the song, and `q` kills that instance and then spawns `sidrst`, because killing a SID player leaves the chip holding its last note. (Killing the demo from the shell skips both — run `sidrst` yourself if you get a drone.) Single-instance: a second `run godzi` is refused, so two copies cannot fight over the SID, and it refuses with `? sprites busy` when another task already owns the sprites (its two looks are different art, so unlike `sprdemo` it cannot share them) |
+| `gortris.tsk` | `run gortris` | **Tetris** — the game logic of Wiebo de Wit's `tetris.c64` (`reference/tetris/`, MIT) ported to GordonOS: its piece set and frame rotations, its move/test order and its line sweep, with the art redrawn with the kernel's glyphs (the reference is char-mode; this is all-bitmap). The 10×20 board is in the task image and is the authority, so collision is a board lookup, not a screen read. Five modes: attract (four screens, 1016 frames), level select (levels 0–9 on the reference's grid — `,`/`.` or a digit to choose, ENTER to start, hi-score table shown), play, and the reference's game-over animation (the well fills a row a frame, is held full ~3 s, empties, then `game over` / `press key` print inside it). Keys: `,` `.` move, `a` `s` turn, ENTER soft drop, `p` pause — plus SPACE, the hard drop (straight to the floor, 2 a row against the step's 1), and `q` to exit, and `m` to mute the music (from any screen — the panel shows `music off`). The port-2 joystick also works (UP rotate CCW, DOWN soft drop, LEFT/RIGHT move, FIRE rotate CW, and FIRE starts a game). 10 lines per level, delay −4 per level (floored at 4), a line scores × (level+1), and the chosen level is remembered. Three hi scores (7-char names) live in the REU FS as `gortris.hi` and are typed in under the kernel's blinking block cursor. Music: it loads `music/tetris.mus` itself and calls `kSidPlay` from a thread child it spawns — **not** via `sidplay.tsk` — and hushes it while the display is lost. The tune is a single pass (no HED/TAL loop inside the file), so the repetition is the player's — the thread passes `repeats = 0` and the tune restarts each time it ends, while `run sidplay tetris` plays it once and stops. **Not re-runnable** (a second `run gortris` gets `? already running`) and **pinned** in the pool, because it owns the display and holds the board |
+
 ## `.lib` shared libraries
 
 These five library files are bundled in the REU image and are loaded

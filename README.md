@@ -70,6 +70,12 @@ Key features:
   task may drive the sprites at a time** (the register set is global: eight art slots,
   one pointer table, per-slot bitmask bytes), so `sprdemo` and `godzi` check at startup
   and print `? sprites busy` rather than corrupting each other — see `docs/bugs.md` #90
+- **Games** - `run gortris` is a full Tetris: a 10x20 board, attract screens,
+  level select, the reference's game-over animation, three hi scores kept in the
+  REU filesystem and typed in under the blinking cursor, keyboard *and* joystick,
+  and its own music (an arrangement of Korobeiniki played through `sid.lib`). It
+  is ported from Wiebo de Wit's `tetris.c64` (MIT) — see `NOTICE` for that port
+  and for the piano sheet the tune's notes were read from
 ## Files
 
 | File            | Size   | Purpose                                     |
@@ -86,8 +92,15 @@ Requires [VICE](https://vice-emu.sourceforge.io/) **3.10 or later** (`x64sc`)
 with REU support. Older versions use the removed `-reuimagesize` flag.
 
 ```bash
-x64sc -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw gordon-os.prg
+x64sc -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw gordon-os.prg
 ```
+
+`-speed 200` runs VICE at 200% of real time — the speed the project's own launch
+configs use, and the speed the kernel's **cursor blink** and **keyboard repeat** are
+tuned for. At another speed, adjust them from the shell (`blink <n>`, `keyrpt <delay>
+<repeat>` — scale the ticks by `200 / speed`), and put those lines in `boot.bat` if you
+want them to survive a reboot; see the
+[quick-start guide](quickstart.binaries.md).
 
 `-reuimagerw` writes the REU image back to disk when VICE exits, so files
 you `save` in GordonOS persist. Or drag `gordon-os.prg` into the VICE window,

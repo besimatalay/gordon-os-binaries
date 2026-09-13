@@ -50,3 +50,77 @@ Neither the 1986 original nor the 2025 disassembly carries an explicit
 license. This component is included as a user-loadable music player;
 redistribution is at the user's own discretion with respect to this
 component.
+
+Tetris "A Theme (Korobeiniki)" - sheet music source
+---------------------------------------------------
+The melody and bass line of `music/tetris.mus` were read from a MIDI made
+from a piano sheet. It is credited here exactly as the sheet prints it:
+
+  "Tetris - A Theme (Korobeiniki)"
+  NinSheetMusic sheet 574, https://www.NinSheetMusic.org/
+  Traditional Russian Folk Song
+  Arrangement by Hirokazu Tanaka
+  Piano Arrangement by Olimar12345
+  Nintendo (C) 1989
+
+The MELODY is a traditional Russian folk song and is in the public domain.
+The sheet, the piano arrangement and Nintendo's 1989 game arrangement are
+not, and none of them carries a licence that permits redistribution of
+derivative works. This repository uses the notes to produce its own
+three-voice SID score -- the chords, the harmony, the waveforms, the
+envelopes and the A A B form are this repository's own work, and
+`tools/gen-mus.py` regenerates the tune from that MIDI -- and it does NOT
+redistribute the sheet, its PDF or the MIDI: none of the three is in this
+repository, so rebuilding the tune needs the MIDI from the user. The credit
+above is given because the notes came from that arrangement; redistribution
+of `music/tetris.mus` is otherwise at the user's own discretion with respect
+to it. For anything beyond personal use, ask the arranger via NinSheetMusic.
+
+Tetris (tetris.c64)
+-------------------
+The `gortris` task is a port of the game logic from Wiebo de Wit's
+"Tetris for the CBM64 in 6502 Assembly" (`reference/tetris/`).
+
+None of the original's artwork is used: its screens and charset are
+char-mode CharPad data, and gortris draws its own field, frame, panel and
+text with the kernel's glyph support. Its music is not used either — the
+reference embeds a SID tune and plays it from its own raster IRQ, while
+gortris plays `music/tetris.mus`, this repository's own three-voice SID
+arrangement of the **Korobeiniki** melody -- a traditional Russian folk song,
+in the public domain. Its melody and bass line were read from a MIDI made from a
+fan piano sheet, credited in the sheet-music entry above; the chords, the
+harmony, the waveforms, the envelopes and the form are this repository's own
+work. The tune was written, not converted: a `.sid` is a program with
+its own player and IRQ, so it cannot be turned into a Sidplayer `.mus` score.
+`tools/gen-mus.py` generates it, and it is played through the shared sound
+library (`sid.lib`, see the entry above), so the chip stays under the
+operating system's control.
+
+Original by Wiebo de Wit (C) 2015.
+Website: https://github.com/wiebow/tetris.c64
+Ported revision: commit d15f86f6 (2017-01-29) — see
+`reference/tetris/UPSTREAM.md` for exactly which parts are ported and
+which are deliberately not.
+
+MIT licence:
+
+   Copyright (c) 2015 Wiebo de Wit.
+
+   Permission is hereby granted, free of charge, to any person obtaining
+   a copy of this software and associated documentation files (the
+   "Software"), to deal in the Software without restriction, including
+   without limitation the rights to use, copy, modify, merge, publish,
+   distribute, sublicense, and/or sell copies of the Software, and to
+   permit persons to whom the Software is furnished to do so, subject to
+   the following conditions:
+
+   The above copyright notice and this permission notice shall be
+   included in all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+   LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+   OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

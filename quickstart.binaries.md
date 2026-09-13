@@ -92,8 +92,9 @@ All 13 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 
 ## `.lib` shared libraries
 
-These five library files are bundled in the REU image and are loaded
-automatically when a task needs them:
+These seven library files are bundled in the REU image and are loaded
+automatically when a task needs them (each task declares its own `libMask` bits
+in its header — see `docs/dynamic-libraries.md`):
 
 | File | Used by | Provides |
 |---|---|---|
@@ -102,8 +103,10 @@ automatically when a task needs them:
 | `gfx.lib` | `gfxdemo`, `fpdemo`, `basic` | Bitmap drawing + pixel-positioned text + matrix fill (hires + multicolor) |
 | `fp.lib` | `basic`, `fpdemo` | Floating-point math |
 | `string.lib` | shell, `dir`, `ps`, `time.lib`, `filesys.lib` | String ops + hex formatting (`kStrlen`/`kStrcpy`/`kStrcmp`/`kSkipSpaces`/`kByteToHex`/`kHexDigit`/`kNibbleToHex`) |
+| `sid.lib` | `sidplay`, `gortris` | COMPUTE!'s Enhanced Sidplayer: `kSidPlay` (play a `.mus` image from RAM — blocking) and `kSidHush` (silence, and stop a running player). ⚠️ The **caller** owns the tune buffer and must declare ZP `$02-$0A`, the player's scratch |
+| `ipc.lib` | `ipctest` | Four lock-free single-producer/single-consumer **byte channels** between tasks, each with a 128-byte ring in the library's own data: `kIpcPost` (blocks by yielding while that ring is full) and `kIpcPick` (never blocks; `C=1` when the channel is empty). No kernel buffer, no syscall, no caller ZP |
 
-## Fonts, banners, sprites and batch files
+## Fonts, banners, sprites, music and batch files
 
 | File | Used by |
 |---|---|
@@ -111,6 +114,7 @@ automatically when a task needs them:
 | `c64uppr.fnt` | Stock C64 uppercase/graphics set (`setfont c64uppr`) |
 | `c64low.fnt` | Stock C64 lowercase/uppercase set (`setfont c64low`) |
 | `boot.bat` | Batch script run automatically at boot |
+| `*.mus` | COMPUTE!'s Enhanced Sidplayer tunes, played by `sidplay` (`run sidplay tetris`) or through `sid.lib` directly: `commodo.mus`, `fsonata.mus` and `tetris.mus` — the last is this repository's own three-voice arrangement of Korobeiniki (see `NOTICE`). Base names ≤ 7 characters |
 | `*.bnr` | Custom-glyph banners drawn with `banner <name> <row> <col>` — every bundled `.bnr` is listed by `dir` |
 | `ball.spr` | The sprite sheet `sprdemo` loads (`kSpriteSheet`/`kSpriteFrame`): 64-byte frames, frame *N* at file offset *N*×64. Authored as `assets/sprites/ball.txt`, converted by `tools/gen-sprites.py`, seeded by the `$assets` array in `tools/build-reu.ps1` — a new `.spr` must be added to that array |
 | `boat.spr` | Two hires frames — the walker of `godzi` (`run godzi`), as the reference's own two co-located sprites: frame 0 = its sprite 0 (the rigging/detail, in FRONT, slot 0, black), frame 1 = its sprite 1 (the filled hull, BEHIND, slot 1, light blue). Where the layers share a pixel the front sprite wins. Same format and pipeline as `ball.spr` |

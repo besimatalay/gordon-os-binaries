@@ -22,11 +22,6 @@ life, holds the board in its own image and plays its own music, so a second
 `run gortris` gets `? already running`. It is **pinned** in the pool as well
 (`KF_NOT_EVICTABLE`): swapping it out mid-game would have to restart the game cold.
 
-> ⚠️ **Only one task may drive the sprites at a time.** The register set is global (eight
-> art slots, one pointer table, per-slot bitmask bytes), so two concurrent sprite tasks
-> would overwrite each other's art and modes. The demos check this at startup and tell you
-> instead of corrupting each other — see `docs/bugs.md` #90.
-
 ## Shell built-ins
 
 | Command | What it does |

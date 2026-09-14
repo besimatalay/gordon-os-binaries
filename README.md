@@ -66,10 +66,7 @@ Key features:
 - Dynamic loading of charsets as .fnt files
 - Sprite sheets as .spr files (64-byte frames, authored as `assets/sprites/*.txt`
   and converted by `tools/gen-sprites.py`; seeded by the `$assets` array in
-  `tools/build-reu.ps1`) — see `docs/programmers-guide.md` → *Sprites*. ⚠️ **Only one
-  task may drive the sprites at a time** (the register set is global: eight art slots,
-  one pointer table, per-slot bitmask bytes), so `sprdemo` and `godzi` check at startup
-  and print `? sprites busy` rather than corrupting each other — see `docs/bugs.md` #90
+  `tools/build-reu.ps1`) — see `docs/programmers-guide.md` → *Sprites*.
 - **Games** - `run gortris` is a full Tetris: a 10x20 board, attract screens,
   level select, the reference's game-over animation, three hi scores kept in the
   REU filesystem and typed in under the blinking cursor, keyboard *and* joystick,

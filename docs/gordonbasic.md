@@ -574,5 +574,4 @@ run basic          ← launch BASIC using the REU working file basicwrk
   programs persist across reboots.
 
 Related documentation: [`quick-start.md`](quick-start.md) (example
-sessions), [`programmers-guide.md`](programmers-guide.md) (task writing),
-[`plans/ehbasic-port-plan.md`](plans/ehbasic-port-plan.md) (port history).
+sessions) and [`programmers-guide.md`](programmers-guide.md) (task writing).

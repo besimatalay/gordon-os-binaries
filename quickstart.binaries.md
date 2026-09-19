@@ -15,8 +15,7 @@ displayed, and the kernel hands its sprite state over with the display, so any n
 sprite tasks may run at once (see [lib-sprite.md](../docs/lib-sprite.md)).
 `godzi` is deliberately **not** re-runnable — it holds the **SID** for its whole session,
 so a second `run godzi` gets `? already running` rather than two copies fighting over the
-chip. (Its sprites need no guard: `run godzi` beside `run sprdemo` is the test that two
-sprite tasks coexist.)
+chip. (Its sprites need no guard: two sprite tasks coexist, each with its own state.)
 `gortris` (Tetris) is **not re-runnable** either — it owns the display for its whole
 life, holds the board in its own image and plays its own music, so a second
 `run gortris` gets `? already running`. It is **pinned** in the pool as well
@@ -76,7 +75,7 @@ All 13 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor: opens the file or starts blank; the document grows on the fly (24-line chunks are kMalloc'd/freed as you type, up to 192 lines), two-way scrolling, insert/overwrite modes, saves back to the same file. `STOP+M` marks a selection (cursor keys extend it, highlighted in reverse video); `STOP+Y` copies it, `STOP+K` cuts it, `STOP+P` pastes the clipboard at the cursor |
 | `border.tsk` | `run border` | Border color flash demo |
 | `maze.tsk` | `run maze` | Animated 10 PRINT maze renderer. `q` exits (or `kill` it from the shell) |
-| `clock.tsk` | `run clock` | Real-time clock at (0,0) on the shared screen |
+| `clock.tsk` | `run clock` | Clock at (0,0) on the shared screen. It only *displays* the CIA #1 TOD, so set it first with `time hh:mm[:ss] [am|pm]`; accurate only at 100% emulation speed, and it loses time under REU load — see [docs/lib-time.md](docs/lib-time.md) |
 | `threads.tsk` | `run threads` | Thread demo — spawns two child threads (border inc/dec) |
 | `gfxdemo.tsk` | `run gfxdemo [step]` | Spider-web line weave — four symmetric corner fans of lines; `step` = line interval 1–25 (default 5, smaller = tighter weave). `q` exits, while drawing or once idle |
 | `fpdemo.tsk` | `run fpdemo` | Floating-point showcase: a sine wave drawn edge to edge with a cosine wave superimposed, computed pixel by pixel; peaks and troughs touch the top and bottom of the screen. Slow by design, then idles with the finished bitmap on screen; `q` exits from either state |

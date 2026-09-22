@@ -72,7 +72,13 @@ Key features:
   REU filesystem and typed in under the blinking cursor, keyboard *and* joystick,
   and its own music (an arrangement of Korobeiniki played through `sid.lib`). It
   is ported from Wiebo de Wit's `tetris.c64` (MIT) — see `NOTICE` for that port
-  and for the piano sheet the tune's notes were read from
+  and for the piano sheet the tune's notes were read from.
+  `run grknoid` is **Gorkanoid**, an Arkanoid/Breakout game: a paddle and a ball
+  against a wall of bricks, five lives, four attract screens, a game-over screen
+  whose tune plays through before it leaves, the same REU-filesystem hi scores
+  and the same keyboard-or-joystick choice. Its music is three Compute's Gazette
+  Sid Collection tunes (`katmand`/`immig`/`firstdt`, one per mode) played through
+  `sid.lib`, one tune in RAM at a time — see `NOTICE` for the collection credit
 ## Files
 
 | File            | Size   | Purpose                                     |

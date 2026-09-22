@@ -51,6 +51,21 @@ license. This component is included as a user-loadable music player;
 redistribution is at the user's own discretion with respect to this
 component.
 
+Compute's Gazette Sid Collection (CGSC) tunes -- gorkanoid
+---------------------------------------------------------
+`music/katmand.mus`, `music/immig.mus` and `music/firstdt.mus` are tunes from
+the Compute's Gazette Sid Collection (CGSC) -- the archive of songs written for
+Compute's Gazette's Sidplayer, which is the same music system as the Enhanced
+SID Player this repository ports (see the entry above). They are played as
+published: a `.mus` file is already a Sidplayer score, so nothing is converted.
+
+Source: https://www.c64music.co.uk/
+Mirror: archive.org, "Compute's Gazette Sid Collection"
+
+The `grknoid` task plays them one per mode -- katmand in the attract loop,
+immig during a game, firstdt once on the game-over screen -- and credits the
+collection on its attract screen.
+
 Tetris "A Theme (Korobeiniki)" - sheet music source
 ---------------------------------------------------
 The melody and bass line of `music/tetris.mus` were read from a MIDI made

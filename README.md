@@ -76,7 +76,8 @@ Key features:
   `run grknoid` is **Gorkanoid**, an Arkanoid/Breakout game: a paddle and a ball
   against a wall of bricks, five lives, four attract screens, a game-over screen
   whose tune plays through before it leaves, the same REU-filesystem hi scores
-  and the same keyboard-or-joystick choice. Its music is three Compute's Gazette
+  and the same keyboard-or-joystick choice, with the paddle's step accelerating from
+  1 px to 3 px while a direction is held. Its music is three Compute's Gazette
   Sid Collection tunes (`katmand`/`immig`/`firstdt`, one per mode) played through
   `sid.lib` out of one buffer held for the session — see `NOTICE` for the collection credit
 ## Files

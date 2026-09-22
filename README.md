@@ -115,6 +115,13 @@ want them to survive a reboot; see the
 > `grknoid` is voiced for 200%**: the player is told to transpose each tune an octave down
 > at the call, which cancels the doubling — so running these binaries at another speed
 > leaves the music an octave off, on top of the pacing change.
+>
+> **A C64 Ultimate needs none of this.** Its turbo is a *CPU* speed setting (up to 48x, 64x on
+> an Elite-II): the CPU gets more of the fast system clock's time slots, the VIC keeps
+> priority, and accesses that leave the board — the SID sockets among them — still run at
+> 1 MHz. So the SID is clocked as it is at 1x and **the pitch does not change**, the video
+> timing stays standard (blink and key repeat included), and the music these binaries carry
+> needs no transpose. Turbo buys CPU throughput, not wall-clock speed.
 
 `-reuimagerw` writes the REU image back to disk when VICE exits, so files
 you `save` in GordonOS persist. Or drag `gordon-os.prg` into the VICE window,

@@ -32,6 +32,11 @@ score table
 > CPU clock, so at 200% every note is an octave higher, and the music in `gortris`/`grknoid`
 > is voiced for exactly that (the player transposes each tune an octave down at the call).
 > Run at another speed and the music is an octave off as well as faster or slower.
+>
+> **On a C64 Ultimate this whole caveat is moot.** Its turbo is a *CPU* speed setting (up to
+> 48x, 64x on an Elite-II) — more of the fast system clock's time slots go to the CPU, the VIC
+> keeps priority, and the bus, SID sockets included, stays at 1 MHz. The SID's pitch therefore
+> does not change and the video timing stays standard, so nothing above needs adjusting there.
 
 ## Shell built-ins
 

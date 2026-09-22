@@ -78,7 +78,7 @@ Key features:
   whose tune plays through before it leaves, the same REU-filesystem hi scores
   and the same keyboard-or-joystick choice. Its music is three Compute's Gazette
   Sid Collection tunes (`katmand`/`immig`/`firstdt`, one per mode) played through
-  `sid.lib`, one tune in RAM at a time — see `NOTICE` for the collection credit
+  `sid.lib` out of one buffer held for the session — see `NOTICE` for the collection credit
 ## Files
 
 | File            | Size   | Purpose                                     |

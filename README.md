@@ -106,6 +106,16 @@ tuned for. At another speed, adjust them from the shell (`blink <n>`, `keyrpt <d
 want them to survive a reboot; see the
 [quick-start guide](quickstart.binaries.md).
 
+> **A speed change is not only a blink/repeat change.** `-speed` runs the whole emulated
+> machine faster, so everything measured against the host's clock moves with it: the blink
+> and key repeat above, a game's perceived pace (its rules are emulated time, so it stays
+> self-consistent, but the player feels the ratio), time-sensitive task output (the `clock`
+> task), and **the SID's pitch** — a voice's output frequency is its register value scaled
+> by the CPU clock, so at 200% every note is an octave higher. **The music in `gortris` and
+> `grknoid` is voiced for 200%**: the player is told to transpose each tune an octave down
+> at the call, which cancels the doubling — so running these binaries at another speed
+> leaves the music an octave off, on top of the pacing change.
+
 `-reuimagerw` writes the REU image back to disk when VICE exits, so files
 you `save` in GordonOS persist. Or drag `gordon-os.prg` into the VICE window,
 then load the image via **Settings > Cartridges > RAM Expansion Module >

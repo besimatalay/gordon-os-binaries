@@ -24,19 +24,28 @@ life, holds the board in its own image and plays its own music, so a second
 **pinned**, because it owns the display for its whole life and holds the wall and the
 score table
 
-> **Run VICE at `-speed 200`, which is what everything here is tuned for.** `-speed` runs
-> the whole emulated machine faster, so anything measured against the host's clock moves:
-> the cursor blink and the keyboard repeat (fix those at runtime with `blink`/`keyrpt`,
-> scaling the ticks by `200 / speed`), a game's perceived pace, the `clock` task's seconds,
-> and **the SID's pitch** — a voice's output frequency is its register value scaled by the
-> CPU clock, so at 200% every note is an octave higher, and the music in `gortris`/`grknoid`
-> is voiced for exactly that (the player transposes each tune an octave down at the call).
-> Run at another speed and the music is an octave off as well as faster or slower.
+> **Run VICE at `-speed 200`, which is what `REU.bin` is built for.** The whole emulated
+> machine runs faster, so anything measured against the host's clock moves: the cursor
+> blink and the keyboard repeat, a game's perceived pace, the `clock` task's seconds, and
+> **the SID's pitch** — the pitch is tied to the CPU clock, so at 200% every note would be
+> an octave higher. **One setting absorbs the system's share of all of it: `speed
+> <percent>`**, declared by a line in the image's `boot.bat`. It scales the kernel's
+> blink/repeat ticks and sid.lib's pitch and tempo compensation, so the keyboard and the
+> music are right whatever the machine runs at. Change it live from the shell with `speed`;
+> the [quick-start guide](quickstart.binaries.md) has the values.
 >
-> **On a C64 Ultimate this whole caveat is moot.** Its turbo is a *CPU* speed setting (up to
-> 48x, 64x on an Elite-II) — more of the fast system clock's time slots go to the CPU, the VIC
-> keeps priority, and the bus, SID sockets included, stays at 1 MHz. The SID's pitch therefore
-> does not change and the video timing stays standard, so nothing above needs adjusting there.
+> **On a C64 Ultimate, use `REU-C64U.bin`** — the same image built with `speed 100`. Its
+> turbo raises the CPU speed without moving the SID's clock or the video timing, so a real
+> machine must not be told 200%.
+>
+> **Running VICE faster than `-speed 200` is not recommended — and that limit is the
+> emulator's, not the machine's.** A C64 Ultimate needs no speed setting at all:
+> `REU-C64U.bin` declares 100, which is the machine's own speed, and that is the whole story.
+> The caveat applies only to the emulator's fast-forward. The music is the limit: `sidlib`
+> answers a faster machine by dropping the tune whole octaves, and one octave is all
+> `-speed 200` needs. At `-speed 400` or `-speed 800` the tune would need two or three, which
+> takes its notes below the SID's usable range — the pitch would come out wrong — and the
+> games' frame counts are at their byte limit there too.
 
 ## Shell built-ins
 
@@ -80,6 +89,7 @@ All 18 are bundled in the REU image:
 | `sidrst.com` | `sidrst` | Reset the SID chip (zeroes `$D400`–`$D418`). The manual fallback for a stuck note: `kill` already clears the chip when the victim (or its spawner) declared `sid.lib`, so this is for a task that died another way, or for a SID left sounding by something that declared nothing |
 | `blink.com` | `blink <n>` | Set the cursor blink interval to `n` ticks (default 30, ~60 Hz) |
 | `keyrpt.com` | `keyrpt <delay> <repeat>` | Set keyboard repeat timing: `delay` ticks before the first repeat (default 30), then `repeat` ticks between repeats (default 6) |
+| `speed.com` | `speed <percent>` | Declare the machine's speed relative to real time (`100` = real time, `200` = what `REU.bin` is built for, powers of two only). Scales the kernel's blink/repeat ticks and sid.lib's music compensation, so the keyboard and the music suit the machine. The image's `boot.bat` sets it at boot; use `REU-C64U.bin` (which declares 100) on a C64 Ultimate |
 
 ## `.tsk` task files
 

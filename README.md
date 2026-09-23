@@ -55,7 +55,12 @@ Key features:
 - REU filesystem - `format`/`save`/`load`/`del`/`rename`/`copy`/`dir`/`type`/`fsinfo`/`compact`, persists across reboots
 - IRQ-driven keyboard - 16-byte ring buffer, key repeat, F-key screen switching
 - Interactive shell - line editing, cursor keys, blinking cursor,
-  custom-glyph `.bnr` banners (`banner <file> <row> <col>`)
+  custom-glyph `.bnr` banners (`banner <file> <row> <col>`), and a machine
+  speed the OS derives its timings and its music from (`speed <percent>`).
+  **100** (the C64 Ultimate image, `REU-C64U.bin`) and **200** (the VICE image,
+  `REU.bin`) are what the shipped images declare; higher values are not
+  recommended, because the pitch shift is one whole octave per step and one is
+  all a 200% machine needs
 - Full-screen text editor - the `edit` task: 25×40, insert/overwrite modes,
   two-way scrolling with content-aware cursor movement; the document grows on
   the fly (24-line chunks are kMalloc'd/freed as you type, up to 192 lines).
@@ -99,22 +104,25 @@ with REU support. Older versions use the removed `-reuimagesize` flag.
 x64sc -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw gordon-os.prg
 ```
 
-`-speed 200` runs VICE at 200% of real time — the speed the project's own launch
-configs use, and the speed the kernel's **cursor blink** and **keyboard repeat** are
-tuned for. At another speed, adjust them from the shell (`blink <n>`, `keyrpt <delay>
-<repeat>` — scale the ticks by `200 / speed`), and put those lines in `boot.bat` if you
-want them to survive a reboot; see the
-[quick-start guide](quickstart.binaries.md).
+`-speed 200` runs VICE at 200% of real time, which is what **`REU.bin` is built for**.
+The OS keeps the machine's speed in one runtime setting — **`speed <percent>`**, declared
+by a line in the image's `boot.bat` — and derives the rest from it: the kernel's **cursor
+blink** and **keyboard repeat** tick counts, and **sid.lib**'s pitch and tempo
+compensation, so neither the music nor the keyboard needs per-task tuning. Change it live
+with `speed` at the shell; `blink <n>` / `keyrpt <delay> <repeat>` still override the
+timings afterwards, and must be run *after* `speed`.
 
 > **A speed change is not only a blink/repeat change.** `-speed` runs the whole emulated
 > machine faster, so everything measured against the host's clock moves with it: the blink
 > and key repeat above, a game's perceived pace (its rules are emulated time, so it stays
 > self-consistent, but the player feels the ratio), time-sensitive task output (the `clock`
 > task), and **the SID's pitch** — a voice's output frequency is its register value scaled
-> by the CPU clock, so at 200% every note is an octave higher. **The music in `gortris` and
-> `grknoid` is voiced for 200%**: the player is told to transpose each tune an octave down
-> at the call, which cancels the doubling — so running these binaries at another speed
-> leaves the music an octave off, on top of the pacing change.
+> by the CPU clock, so at 200% every note is an octave higher. Declaring the speed is what
+> absorbs the keyboard's and the music's share of that; the [quick-start
+guide](quickstart.binaries.md) has the table of values.
+>
+> **Two images, one setting.** `REU.bin` declares 200% for VICE. **`REU-C64U.bin`** is the
+> same image built with `speed 100`, for a C64 Ultimate — see below.
 >
 > **A C64 Ultimate needs none of this.** Its turbo is a *CPU* speed setting (up to 48x, 64x on
 > an Elite-II): the CPU gets more of the fast system clock's time slots, the VIC keeps

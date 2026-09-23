@@ -1,5 +1,10 @@
 # Quick Start
 
+**Which image?** Two ship, and they are alternatives: `REU.bin` pairs with VICE at
+`-speed 200`, and `REU-C64U.bin` with a C64 Ultimate (or any real machine), which needs no
+speed setting at all. Each declares its machine's speed in its own `boot.bat` — see the note
+on `speed` below. They differ in that one line and nothing else.
+
 After boot you land in the shell (a blinking block cursor). The shell is
 itself a dynamic task (`shell.tsk`) loaded from the REU filesystem by the
 boot task.

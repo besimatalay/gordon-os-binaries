@@ -7,6 +7,17 @@ system kernel for the Commodore 64 with a RAM Expansion Unit (REU). This
 repository contains only the binaries needed to *run* GordonOS - source code
 is not included here.
 
+## The files
+
+| File | What it is |
+|---|---|
+| `build/gordon-os.prg` | The kernel. Autostart it in VICE, or on a real machine with an REU. |
+| `reu/REU.bin` | The REU image to boot it with **in VICE**, whose `boot.bat` declares `speed 200` — the 200% fast-forward the launch scripts use. |
+| `reu/REU-C64U.bin` | The same image built for a **C64 Ultimate** (or any real machine): `speed 100`. Its turbo raises the CPU speed without moving the SID's clock or the video timing, so a real machine must not be told 200%. |
+
+The two images differ only in that one declaration, and they are alternatives: boot the
+kernel with one of them.
+
 ## What is GordonOS?
 
 GordonOS is a from-scratch OS kernel for the C64 + REU. Both KERNAL and BASIC

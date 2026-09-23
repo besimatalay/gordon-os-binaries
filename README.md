@@ -141,6 +141,12 @@ guide](quickstart.binaries.md) has the table of values.
 > 1 MHz. So the SID is clocked as it is at 1x and **the pitch does not change**, the video
 > timing stays standard (blink and key repeat included), and the music these binaries carry
 > needs no transpose. Turbo buys CPU throughput, not wall-clock speed.
+>
+> **The video standard is measured, not declared.** The clock a standard fixes — 985248 Hz on
+> PAL, 1022727 Hz on NTSC — scales every note too, and the player's note table is the NTSC
+> one, so `sid.lib` measures the standard from the VIC once per load and reads the matching
+> table: a PAL machine is in tune, and only the top octave's B note is 45.5 cents flat. There
+> is nothing to set for it on either image.
 
 `-reuimagerw` writes the REU image back to disk when VICE exits, so files
 you `save` in GordonOS persist. Or drag `gordon-os.prg` into the VICE window,

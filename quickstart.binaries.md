@@ -41,7 +41,10 @@ score table
 >
 > **On a C64 Ultimate, use `REU-C64U.bin`** — the same image built with `speed 100`. Its
 > turbo raises the CPU speed without moving the SID's clock or the video timing, so a real
-> machine must not be told 200%.
+> machine must not be told 200%. **The video standard needs no setting on either machine**:
+> the clock a standard fixes also scales every note, so `sidlib` measures the standard from
+> the VIC once per load and reads its own copy of the note table — a PAL Ultimate is in tune
+> with nothing declared, and only the top octave's B note is 45.5 cents flat.
 >
 > **Running VICE faster than `-speed 200` is not recommended — and that limit is the
 > emulator's, not the machine's.** A C64 Ultimate needs no speed setting at all:

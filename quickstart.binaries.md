@@ -13,7 +13,7 @@ BASIC's program RAM is a persistent 64 KB REU working file (`basicwrk`) —
 open it with `run basic` (reused if present, created if absent, deleted on
 `exit`).
 
-The `.tsk` tasks `gfxdemo`, `fpdemo`, `sprdemo`, `border`, `maze` and `threads` are
+The `.tsk` tasks `gfxdemo`, `fpdemo`, `spirog`, `sprdemo`, `maze` and `clock` are
 **re-runnable**: `run` them multiple times for a fresh copy each time. `sprdemo` is
 unconditional about it — a task owns all eight sprite slots while its surface is
 displayed, and the kernel hands its sprite state over with the display, so any number of
@@ -108,11 +108,10 @@ All 13 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 | `shell.tsk` | `run shell` | The interactive shell itself. This is a re-entrant task that is started automatically when the system boots, but you can also run multiple copies of it if you wish |
 | `basic.tsk` | `run basic` | Gordon BASIC interpreter (EhBASIC) + line editor + bitmap-graphics commands (`mode`/`pen0`–`pen3`/`plot`/`circle`/…); opens the persistent REU working file `basicwrk` (reused if present, created if absent, deleted on `exit`). See the [Gordon Basic language reference](docs/gordonbasic.md) |
 | `edit.tsk` | `run edit <file>` | Full-screen 25×40 editor: opens the file or starts blank; the document grows on the fly (24-line chunks are kMalloc'd/freed as you type, up to 192 lines), two-way scrolling, insert/overwrite modes, saves back to the same file. `STOP+M` marks a selection (cursor keys extend it, highlighted in reverse video); `STOP+Y` copies it, `STOP+K` cuts it, `STOP+P` pastes the clipboard at the cursor |
-| `border.tsk` | `run border` | Border color flash demo |
 | `maze.tsk` | `run maze` | Animated 10 PRINT maze renderer. `q` exits (or `kill` it from the shell) |
 | `clock.tsk` | `run clock` | Clock at (0,0) on the shared screen. It only *displays* the CIA #1 TOD, so set it first with `time hh:mm[:ss] [am|pm]`; accurate only at 100% emulation speed, and it loses time under REU load — see [docs/lib-time.md](docs/lib-time.md) |
-| `threads.tsk` | `run threads` | Thread demo — spawns two child threads (border inc/dec) |
 | `gfxdemo.tsk` | `run gfxdemo [step]` | Spider-web line weave — four symmetric corner fans of lines; `step` = line interval 1–25 (default 5, smaller = tighter weave). `q` exits, while drawing or once idle |
+| `spirog.tsk` | `run spirog [R r d col \| 1-9]` | Integer spirograph — a hypotrochoid traced as a `kLine` polyline from a 256-entry sine table (no floating point), so the curve closes exactly. `R` ring radius, `r` rolling radius (`R` must exceed `r`), `d` pen offset, `col` 1–15; values above 127 are clamped and the figure is scaled to fit. No arguments = an 80/35/45 rosette in colour 1, and a single `1`–`9` picks a preset shape sized to use the full screen height, while `10` uses multicolour mode to draw 25 random presets at random sizes and positions, each in one of three colours picked at random for the whole screen. `q` exits, while drawing or once idle |
 | `fpdemo.tsk` | `run fpdemo` | Floating-point showcase: a sine wave drawn edge to edge with a cosine wave superimposed, computed pixel by pixel; peaks and troughs touch the top and bottom of the screen. Slow by design, then idles with the finished bitmap on screen; `q` exits from either state |
 | `sidplay.tsk` | `run sidplay <name> [delay] [repeats] [transpose]` | Plays a COMPUTE!'s Enhanced Sidplayer `.mus` song (`commodo`, `fsonata`, `tetris` bundled) through **`sid.lib`** — single-instance, no screen. `delay` = ticks per jiffy (default 1, raise to slow down), `repeats` = `0` forever / `1` once (default) / N plays. A failure prints `? tune <name>` / `? load <name>` / `? no memory` / `? no player` on a temporary screen and waits for a key |
 | `sprdemo.tsk` | `run sprdemo` | The sprite subsystem's demo: eight coloured balls bouncing off the walls and off each other, driven through the sprite library with one update per displayed frame. `q` exits (or `kill` it from the shell). Its only asset is `ball.spr`. **Re-runnable, with no guard**: a task owns all eight slots while its surface is displayed and the kernel swaps the whole sprite state with the display, so it runs happily beside `godzi` |
@@ -130,7 +129,7 @@ in its header — see `docs/dynamic-libraries.md`):
 |---|---|---|
 | `time.lib` | `clock`, `time` | Clock reading and printing |
 | `filesys.lib` | shell, `basic`, `format`, `rename`, `copy`, `godzi`, `gortris`, `grknoid` | Filesystem format/save/delete/rename + in-place create/open/readAt/writeAt |
-| `gfx.lib` | `gfxdemo`, `fpdemo`, `basic` | Bitmap drawing + pixel-positioned text + matrix fill (hires + multicolor) |
+| `gfx.lib` | `gfxdemo`, `fpdemo`, `spirog`, `basic` | Bitmap drawing + pixel-positioned text + matrix fill (hires + multicolor) |
 | `fp.lib` | `basic`, `fpdemo` | Floating-point math |
 | `string.lib` | shell, `dir`, `ps`, `time.lib`, `filesys.lib` | String ops + hex formatting (`kStrlen`/`kStrcpy`/`kStrcmp`/`kSkipSpaces`/`kByteToHex`/`kHexDigit`/`kNibbleToHex`) |
 | `sid.lib` | `sidplay`, `gortris`, `godzi`, `grknoid` | COMPUTE!'s Enhanced Sidplayer: `kSidPlay` (play a `.mus` image from RAM — blocking) and `kSidHush` (silence, and stop a running player). ⚠️ The **caller** owns the tune buffer and must declare ZP `$02-$0A`, the player's scratch |

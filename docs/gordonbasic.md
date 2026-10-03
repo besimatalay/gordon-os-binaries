@@ -28,8 +28,7 @@ This reference is based on the
 [EhBASIC language reference](http://retro.hansotten.nl/6502-sbc/lee-davison-web-site/enhanced-6502-basic/ehbasic-language-reference/),
 with the following changes:
 
-**Removed** (features GordonOS owns, features with no usable meaning here, and a
-few dropped to fit the pool):
+**Removed** (features GordonOS owns and features with no usable meaning here):
 
 - `irq`, `nmi`, `retirq`, `retnmi`, `on irq`, `on nmi`, `off`, `null` —
   interrupt-handler plumbing. GordonOS owns all interrupts; BASIC never
@@ -47,22 +46,6 @@ few dropped to fit the pool):
 - `setfont "<name>"` — the shell's `setfont <name>` command reaches the same
   kernel call, so the font switch itself is unchanged.
 
-The last three were dropped to fit the pool: `basic` holds its code, the eager
-`gfx.lib` and `fp.lib` its libMask names, and the `filesys.lib` its cold start
-opens its REU working file with. That sum is exactly the pool, and
-`tools/check-pool-budget.ps1` computes it for every task in the build.
-
-⚠️ **Removing a statement touches FIVE positional structures** in `ehbasic.asm`,
-and the build's checks cover four of them: the `tk_*` chain, the dispatch tables
-(`lab_ctbl`/`lab_gxctbl` for statements, `lab_ftpl`/`lab_ftbl` for functions), and
-the `.text`+`.byte` keyword chains (`tab_asc*`). The fifth is **`lab_keyt`, a
-dense four-byte record per token indexed by the raw token value**
-(`lab_keyt + token*4`), which `LIST` uses to print a token's name. A missing or
-extra record there fails no assert, no relocation check and no table-order check
-— it shifts every later record out of step and garbles the listing while the
-interpreter itself still runs. Count the records against the token count when you
-finish.
-
 **Added** (GordonOS integration):
 
 - `dir` — list the REU filesystem.
@@ -75,8 +58,8 @@ finish.
 
 **Changed:**
 
-- `save` / `load` — stock EhBASIC left these as no-op vectors. Gordon Basic
-  implements them against the REU filesystem (see below).
+- `save` / `load` — stock EhBASIC has no implementation behind either; Gordon
+  Basic implements them against the REU filesystem (see below).
 
 Everything else is the same as EhBASIC: numbers, strings, variables,
 operators, functions, and the error model.

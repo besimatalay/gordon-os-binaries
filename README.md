@@ -83,6 +83,15 @@ Key features:
 - Sprite sheets as .spr files (64-byte frames, authored as `assets/sprites/*.txt`
   and converted by `tools/gen-sprites.py`; seeded by the `$assets` array in
   `tools/build-reu.ps1`) — see `docs/programmers-guide.md` → *Sprites*.
+- **GordonPaint** - `run grpaint <name>` is the paint program the mouse exists
+  for: a canvas in hires (320x200) or multicolour (160x200), a palette and tool
+  band over the bottom two cell rows (thirteen tiles plus the four multicolour
+  slot chips), undo/redo five steps each way, and `<name>.pic` save/load in a
+  documented 10,032-byte format. `run grview <name>` is its viewer, and
+  `hires.pic`, `mc.pic`, `alf.pic` and `alfgs.pic` ship as samples — see
+  `docs/pic-format.md`. It is mouse-only and single-instance: its live footprint
+  is 71 of the pool's 109 pages, so a second `run grpaint` gets
+  `? already running` rather than evicting the copy being drawn in.
 - **1351 mouse support** - `mouse.lib` reads the proportional mouse on **control
   port 2** (the SID's analog POT lines, selected through PRA `$DC00`), and turns
   the wrapping position it reports into signed deltas plus the two button lines.

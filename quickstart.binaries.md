@@ -155,6 +155,7 @@ in its header — see `docs/dynamic-libraries.md`):
 | `c64uppr.fnt` | Stock C64 uppercase/graphics set (`setfont c64uppr`) |
 | `c64low.fnt` | Stock C64 lowercase/uppercase set (`setfont c64low`) |
 | `boot.bat` | Batch script run automatically at boot |
+| `buildid` | The build stamp: the date and time the image was written, printed by `type buildid`. Digits and punctuation only, because `type` writes a file's bytes as they are |
 | `*.mus` | COMPUTE!'s Enhanced Sidplayer tunes, played by `sidplay` (`run sidplay tetris`) or through `sid.lib` directly: `commodo.mus`, `fsonata.mus` and `tetris.mus` — the last is this repository's own three-voice arrangement of Korobeiniki (see `NOTICE`). Base names ≤ 7 characters |
 | `*.bnr` | Custom-glyph banners drawn with `banner <name> <row> <col>` — every bundled `.bnr` is listed by `dir` |
 | `ball.spr` | The sprite sheet `sprdemo` loads (`kSpriteSheet`/`kSpriteFrame`): 64-byte frames, frame *N* at file offset *N*×64. Authored as `assets/sprites/ball.txt`, converted by `tools/gen-sprites.py`, seeded by the `$assets` array in `tools/build-reu.ps1` — a new `.spr` must be added to that array |

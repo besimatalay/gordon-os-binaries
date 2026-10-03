@@ -12,7 +12,7 @@ is not included here.
 | File | What it is |
 |---|---|
 | `build/gordon-os.prg` | The kernel. Autostart it in VICE, or on a real machine with an REU. |
-| `reu/REU.bin` | The REU image to boot it with **in VICE**, whose `boot.bat` declares `speed 200` — the 200% fast-forward the launch scripts use. |
+| `reu/REU.bin` | The REU image to boot it with **in VICE**, whose `boot.bat` declares `speed 200` (the 200% fast-forward the launch scripts use) and `mouse 1351` (the pointer is live from the first prompt). |
 | `reu/REU-C64U.bin` | The same image built for a **C64 Ultimate** (or any real machine): `speed 100`. Its turbo raises the CPU speed without moving the SID's clock or the video timing, so a real machine must not be told 200%. |
 
 The two images differ only in that one declaration, and they are alternatives: boot the
@@ -83,6 +83,14 @@ Key features:
 - Sprite sheets as .spr files (64-byte frames, authored as `assets/sprites/*.txt`
   and converted by `tools/gen-sprites.py`; seeded by the `$assets` array in
   `tools/build-reu.ps1`) — see `docs/programmers-guide.md` → *Sprites*.
+- **1351 mouse support** - `mouse.lib` reads the proportional mouse on **control
+  port 2** (the SID's analog POT lines, selected through PRA `$DC00`), and turns
+  the wrapping position it reports into signed deltas plus the two button lines.
+  `mouse 1351` / `mouse off` declares which pointer the machine has — the default
+  is off, so nothing needs it — and the `mtest` command shows the raw POT bytes,
+  the position, the deltas and the button lines live, so a machine whose SID
+  replacement cannot drive the analog lines can be told apart from a
+  configuration mistake. See `docs/lib-mouse.md`.
 - **Games** - `run gortris` is a full Tetris: a 10x20 board, attract screens,
   level select, the reference's game-over animation, three hi scores kept in the
   REU filesystem and typed in under the blinking cursor, keyboard *and* joystick,
@@ -122,6 +130,27 @@ blink** and **keyboard repeat** tick counts, and **sid.lib**'s pitch and tempo
 compensation, so neither the music nor the keyboard needs per-task tuning. Change it live
 with `speed` at the shell; `blink <n>` / `keyrpt <delay> <repeat>` still override the
 timings afterwards, and must be run *after* `speed`.
+
+**GordonPaint needs a mouse, and that is two flags, not one.** The paint program (`grpaint`)
+drives its pointer sprite from a Commodore **1351** in control port 2, so start VICE with the
+device *and* the host-pointer grab:
+
+```bash
+x64sc -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw \
+      -controlport2device 1351 -mouse gordon-os.prg
+```
+
+- `-controlport2device 1351` puts a 1351 in control port 2 — `1351` is one of the names VICE's
+own control-port option accepts (`3` is its number). In the GUI it is *Control port settings* →
+control port 2 → **Mouse (1351)**.
+- `-mouse` is VICE's `Mouse` resource, the host-pointer grab. **Without it the POT bytes stay
+frozen and the buttons read released**, so the control-port device alone is not enough. In the
+GUI it is VICE's mouse-grab setting.
+- **Attach it before the machine starts**: VICE's own note is that attaching a mouse afterwards
+needs a reset.
+
+Then declare it at the shell — `mouse 1351` — and `run grpaint shot` will take the pointer. A
+joystick can go back into port 2 when you are done.
 
 > **A speed change is not only a blink/repeat change.** `-speed` runs the whole emulated
 > machine faster, so everything measured against the host's clock moves with it: the blink
@@ -177,6 +206,23 @@ Then load the REU image using either method:
 
 Finally, return to the file browser, select `gordon-os.prg`, press **Return**
 and choose **Run** (DMA load) to start GordonOS.
+
+### The 1351 mouse (GordonPaint)
+`grpaint` — the paint program — is mouse-only and refuses to start without a 1351: it prints
+`? mouse off - run 'mouse 1351'` and waits for a key. There are two ways to give it one:
+
+- **A real 1351** in control port 2. The mouse is a joystick-port device and the Ultimate
+  handles the POT lines on the board itself, so a real one needs nothing enabled. If the only
+  free port is port 1, an **Ultimate 64 Elite** board can swap the two ports from the menu:
+  press **C= + J**.
+- **A USB mouse**, which the machine presents to the C64 as a 1351. Its mouse options include
+  *Cursor*, *Mouse*, *Mouse+Cursor* and *Mouse+Wheel* modes, with sensitivity, adaptive
+  acceleration and wheel settings; firmware 3.15 reads each mouse's HID report descriptor
+  rather than assuming boot protocol, which is what makes most USB mice work. It also reports
+  the mouse it detected and the HID mode it chose.
+
+Either way, declare it at the shell with **`mouse 1351`** — the image's `boot.bat` already does
+it at boot, so a fresh start is ready. The REU setup above is the other half.
 
 ### Persistence
 

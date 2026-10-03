@@ -28,8 +28,8 @@ This reference is based on the
 [EhBASIC language reference](http://retro.hansotten.nl/6502-sbc/lee-davison-web-site/enhanced-6502-basic/ehbasic-language-reference/),
 with the following changes:
 
-**Removed** (hardware/OS-specific or unsafe features not applicable on
-GordonOS):
+**Removed** (features GordonOS owns, features with no usable meaning here, and a
+few dropped to fit the pool):
 
 - `irq`, `nmi`, `retirq`, `retnmi`, `on irq`, `on nmi`, `off`, `null` —
   interrupt-handler plumbing. GordonOS owns all interrupts; BASIC never
@@ -37,6 +37,31 @@ GordonOS):
 - `usr(<expr>)` — user-routine call vector.
 - `bitclr`, `bitset`, `bittst` — bit-manipulation commands/function.
 - `twopi` — the constant `2*pi`.
+- `deek(<addr>)`, `doke <addr,w>` — use `peek(<addr>)` and `poke <addr,b>`,
+  which address real C64 memory; a word is two pokes.
+- `varptr(<var[$]>)`, `sadd(<expr$>)` — both hand back a bare address whose
+  *domain* this port tracks internally and cannot publish: a string's data lives
+  either in the REU working file or on the zero-page descriptor stack, and which
+  one it is sits in `desDom`, because REU offsets and ZP addresses both have a
+  high byte of `$00` for small programs. Nothing in BASIC could use the value.
+- `setfont "<name>"` — the shell's `setfont <name>` command reaches the same
+  kernel call, so the font switch itself is unchanged.
+
+The last three were dropped to fit the pool: `basic` holds its code, the eager
+`gfx.lib` and `fp.lib` its libMask names, and the `filesys.lib` its cold start
+opens its REU working file with. That sum is exactly the pool, and
+`tools/check-pool-budget.ps1` computes it for every task in the build.
+
+⚠️ **Removing a statement touches FIVE positional structures** in `ehbasic.asm`,
+and the build's checks cover four of them: the `tk_*` chain, the dispatch tables
+(`lab_ctbl`/`lab_gxctbl` for statements, `lab_ftpl`/`lab_ftbl` for functions), and
+the `.text`+`.byte` keyword chains (`tab_asc*`). The fifth is **`lab_keyt`, a
+dense four-byte record per token indexed by the raw token value**
+(`lab_keyt + token*4`), which `LIST` uses to print a token's name. A missing or
+extra record there fails no assert, no relocation check and no table-order check
+— it shifts every later record out of step and garbles the listing while the
+interpreter itself still runs. Count the records against the token count when you
+finish.
 
 **Added** (GordonOS integration):
 
@@ -45,7 +70,7 @@ GordonOS):
 - A full **bitmap graphics** command set: `mode`, `pen0`–`pen3`, `cls`,
   `plot`, `line`, `box`, `fillbox`, `circle`, `ellipse`, `flood`,
   `gchar`, `gtext`, `printat`, `locate`, `colour`, `border`, `scroll`,
-  `scrollby`, `shadow`, `gdef`, `glyph`, `setfont`, and the
+- `scrollby`, `shadow`, `gdef`, `glyph`, and the
   `getpixel()` function — documented in [Graphics](#graphics).
 
 **Changed:**
@@ -113,19 +138,21 @@ below. Spaces may not be included in them
 
 ```
 abs   and   asc   atn   bin$  call  chr$  clear cont  cos
-data  dec   deek  def   dim   dir   do    doke  end   eor
-exit  exp   fn    for   fre   get   gosub goto  hex$  if
-inc   input int   lcase$ left$ len  let   list  load  log
-loop  max   mid$  min   new   next  not   on    or    peek
-pi    poke  pos   print read  rem   restore return right$ rnd
-run   sadd  save  sgn   sin   spc  sqr   step  stop  str$
-swap  tab  tan   then  to    ucase$ until val  varptr wait
-while width
+data  dec   def   dim   dir   do    end   eor   exit  exp
+fn    for   fre   get   gosub goto  hex$  if    inc   input
+int   lcase$ left$ len  let   list  load  log   loop  max
+mid$  min   new   next  not   on    or    peek  pi    poke
+pos   print read  rem   restore return right$ rnd  run   save
+sgn   sin   spc   sqr   step  stop  str$  swap  tab   tan
+then  to    ucase$ until val  wait  while width
 border box   circle cls   colour cursor ellipse fillbox flood
 gchar  gdef  getpixel glyph gtext line locate mode pen0 pen1
-pen2   pen3  plot  printat scroll scrollby setfont shadow
+pen2   pen3  plot  printat scroll scrollby shadow
 +  -  *  /  ^  <<  >>  <  <=  =  >=  >  <>
 ```
+
+`deek`, `doke`, `varptr`, `sadd` and `setfont` are not in this port — see
+[Removed](#differences-from-stock-ehbasic).
 
 ### Notation
 
@@ -263,8 +290,7 @@ name; `<var>` is a simple variable used as the (local) argument.
 
 ### `poke <addr,b>`
 
-Writes byte `b` to address `addr`. `doke <addr,w>` writes a word (low byte
-at `addr`, high byte at `addr+1`).
+Writes byte `b` to address `addr`, which is a real C64 address.
 
 ### `call <addr>`
 
@@ -438,9 +464,6 @@ non-zero value sets (the pixel then shows `pen1`'s colour); in multicolor
 - `gtext x,y,c,"str"` — draw a string of glyphs at pixel `(x,y)`.
 - `gdef n,b0,b1,…,b7` — define custom glyph `n` (0–15) from 8 rows.
 - `glyph n` — print custom glyph `n` at the text cursor.
-- `setfont "name"` — switch the system font to `name.fnt` from the
-  REU filesystem (REU-only font: updates the kernel's font record; the
-  2 KB file stays in the REU FS and the blitter DMA's glyphs on demand).
 
 ### Cursor and scrolling
 
@@ -507,9 +530,6 @@ circle 120,100,30,3    ' white
 | `cos(expr)` / `sin(expr)` / `tan(expr)` | Trig functions (radians) |
 | `atn(expr)` | Arc tangent |
 | `peek(addr)` | Byte at `addr` |
-| `deek(addr)` | Word at `addr` |
-| `sadd(expr$)` | Pointer to the string data |
-| `varptr(var[$])` | Pointer to the variable (numeric value or string descriptor) |
 | `len(expr$)` | String length |
 | `str$(expr)` | Numeric value as a string |
 | `val(expr$)` | String as a numeric value |
@@ -573,5 +593,5 @@ run basic          ← launch BASIC using the REU working file basicwrk
 - **`dir`**, **`save`**, and **`load`** use the REU filesystem; saved
   programs persist across reboots.
 
-Related documentation: [`quick-start.md`](quick-start.md) (example
-sessions) and [`programmers-guide.md`](programmers-guide.md) (task writing).
+Related documentation in the source repository: `quick-start.md` (example
+sessions) and `programmers-guide.md` (task writing).

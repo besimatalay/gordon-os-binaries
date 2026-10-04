@@ -42,8 +42,8 @@ Key features:
 - Dynamic task loader - `run <name>` loads relocatable + reentrant +
   re-runnable task binaries from the REU filesystem at runtime, with pool
   eviction when the pool is full
-- Dynamic kernel libraries - shared `.lib` binaries (time/filesys/gfx/fp/string/sid/ipc) loaded
-  on demand
+- Dynamic kernel libraries - shared `.lib` binaries (time/filesys/gfx/fp/string/sid/ipc/sprite/mouse)
+  loaded on demand
 - Generic kernel heap - task-owned memory blocks preserved across eviction;
   `pool` shows the pool map
 - Gordon Basic (derived from EhBASIC) - full floating-point BASIC with

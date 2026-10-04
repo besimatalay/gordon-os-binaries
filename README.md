@@ -11,9 +11,9 @@ is not included here.
 
 | File | What it is |
 |---|---|
-| `build/gordon-os.prg` | The kernel. Autostart it in VICE, or on a real machine with an REU. |
-| `reu/REU.bin` | The REU image to boot it with **in VICE**, whose `boot.bat` declares `speed 200` (the 200% fast-forward the launch scripts use) and `mouse 1351` (the pointer is live from the first prompt). |
-| `reu/REU-C64U.bin` | The same image built for a **C64 Ultimate** (or any real machine): `speed 100`. Its turbo raises the CPU speed without moving the SID's clock or the video timing, so a real machine must not be told 200%. |
+| `gordon-os.prg` | The kernel. Autostart it in VICE, or on a real machine with an REU. |
+| `REU.bin` | The REU image to boot it with **in VICE**, whose `boot.bat` declares `speed 200` (the 200% fast-forward the launch scripts use) and `mouse 1351` (the pointer is live from the first prompt). |
+| `REU-C64U.bin` | The same image built for a **C64 Ultimate** (or any real machine): `speed 100`. Its turbo raises the CPU speed without moving the SID's clock or the video timing, so a real machine must not be told 200%. |
 
 The two images differ only in that one declaration, and they are alternatives: boot the
 kernel with one of them.
@@ -80,18 +80,26 @@ Key features:
   it, `STOP+P` pastes at the cursor
 - Batch file support as .bat files
 - Dynamic loading of charsets as .fnt files
-- Sprite sheets as .spr files (64-byte frames, authored as `assets/sprites/*.txt`
-  and converted by `tools/gen-sprites.py`; seeded by the `$assets` array in
-  `tools/build-reu.ps1`) — see `docs/programmers-guide.md` → *Sprites*.
+- Sprite sheets as .spr files (64-byte frames, frame *N* at file offset *N*×64)
 - **GordonPaint** - `run grpaint <name>` is the paint program the mouse exists
   for: a canvas in hires (320x200) or multicolour (160x200), a palette and tool
   band over the bottom two cell rows (thirteen tiles plus the four multicolour
   slot chips), undo/redo five steps each way, and `<name>.pic` save/load in a
-  documented 10,032-byte format. `run grview <name>` is its viewer, and
-  `hires.pic`, `mc.pic`, `alf.pic` and `alfgs.pic` ship as samples — see
-  `docs/pic-format.md`. It is mouse-only and single-instance: its live footprint
+  fixed 10,032-byte format. `run grview <name>` is its viewer, and
+  `hires.pic`, `mc.pic`, `alf.pic` and `alfgs.pic` ship as samples. It is
+  mouse-only and single-instance: its live footprint
   is 71 of the pool's 109 pages, so a second `run grpaint` gets
   `? already running` rather than evicting the copy being drawn in.
+- **GordonAnim** - `run granim llama` plays a **full-screen animation** out of the
+  REU filesystem: 360 multicolour frames at 24 fps (15 seconds), stored as 60
+  chunks of six frames plus a manifest. The transfer is split over six reads a
+  frame so no window holds interrupts off for long, the film clock follows the
+  machine's declared *speed* (so it is the same length in real time at 200% as on
+  a real C64), and the display is checked before every update, so an F-key switch
+  pauses the film rather than drawing into the new owner's screen. `+`/`-` change
+  the rate, SPACE pauses, `q` exits. The film is a greyscale conversion of
+  *Caminandes 1: "Llama Drama"* (Blender Foundation, CC-BY 3.0 — credit in
+  `NOTICE`).
 - **1351 mouse support** - `mouse.lib` reads the proportional mouse on **control
   port 2** (the SID's analog POT lines, selected through PRA `$DC00`), and turns
   the wrapping position it reports into signed deltas plus the two button lines.
@@ -99,7 +107,7 @@ Key features:
   is off, so nothing needs it — and the `mtest` command shows the raw POT bytes,
   the position, the deltas and the button lines live, so a machine whose SID
   replacement cannot drive the analog lines can be told apart from a
-  configuration mistake. See `docs/lib-mouse.md`.
+  configuration mistake.
 - **Games** - `run gortris` is a full Tetris: a 10x20 board, attract screens,
   level select, the reference's game-over animation, three hi scores kept in the
   REU filesystem and typed in under the blinking cursor, keyboard *and* joystick,
@@ -278,8 +286,10 @@ the shell boots.
 ## License / Notice
 
 GordonOS is licensed under the GNU GPL v2 or later - see `LICENSE.md`.
-Third-party notices (EhBASIC, filesystem code, and the Enhanced SID
-Player used by the `sidplay` task) are in `NOTICE`.
+Third-party notices (EhBASIC, filesystem code, the Enhanced SID Player used by
+the `sidplay` task, the *Caminandes* animation, and the ALF images -- the boot
+banner `logo320` and the sample pictures `alf.pic`/`alfgs.pic`, included
+non-commercially and claimed as fair use) are in `NOTICE`.
 
 The `sidplay` player routine is a port of COMPUTE!'s Enhanced SID
 Player (Craig Chamberlain, 1986) as disassembled by Chris Zinn (2025).

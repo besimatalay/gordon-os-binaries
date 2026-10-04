@@ -113,9 +113,13 @@ operating system's control.
 
 Original by Wiebo de Wit (C) 2015.
 Website: https://github.com/wiebow/tetris.c64
-Ported revision: commit d15f86f6 (2017-01-29) — see
-`reference/tetris/UPSTREAM.md` for exactly which parts are ported and
-which are deliberately not.
+Ported revision: commit d15f86f6 (2017-01-29) — the game logic only,
+re-expressed for GordonOS's bitmap display: the seven tetrominoes and their
+rotations, the play-mode state machine and its level rule, full-row detection
+and clearing, the game-over animation and the mode machine around it. The
+screens and the input are redrawn, the hi-score table is stored in the REU
+filesystem, and the hard drop, the music and the quit key are this port's own.
+Nothing from the reference is built, imported or linked.
 
 MIT licence:
 
@@ -139,3 +143,57 @@ MIT licence:
    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Caminandes 1: "Llama Drama" -- the bundled animation
+----------------------------------------------------
+`assets/anim/llama/` is the animation `granim` plays (`run granim llama`).
+It is a conversion of the Blender Foundation open movie
+**Caminandes 1: "Llama Drama"** (2013):
+
+  Title:    Caminandes 1: Llama Drama
+  Creator:  Pablo Vazquez
+  Producer: Blender Foundation / CineLibre
+  Source:   https://archive.org/details/Caminandes1LlamaDrama
+  Licence:  Creative Commons Attribution 3.0 (CC-BY 3.0)
+            https://creativecommons.org/licenses/by/3.0/
+
+The excerpt is 15 seconds -- t = 44-59 s of the 90-second film -- cropped to
+4:3, desaturated, tone-curved and converted to 360 multicolour `.pic` frames,
+then packed as `.anm` chunks by `tools/gen-anim.py`. What is redistributed here
+is that converted frame data and nothing else: 60 chunk files and a manifest, in
+which no frame is the original picture at its own resolution. It is a **derived
+work**, so it carries the same CC-BY 3.0 terms as the film, and this attribution
+is what those terms require. The download the frames were extracted from is not
+in this repository.
+
+ALF -- the boot banner and the two sample pictures
+--------------------------------------------------
+`logo320.bnr` -- the banner `boot.bat` draws at the top of the screen on every
+boot, `banner logo320 0 0` -- and the bundled sample pictures `alf.pic` and
+`alfgs.pic` are images of **ALF**, the title character of the American
+television sitcom *ALF* (NBC, 1986-1990):
+
+  Character:   ALF, "Alien Life Form" -- real name Gordon Shumway, of the
+               planet Melmac
+  Created by:  Tom Patchett and Paul Fusco; ALF was performed by Paul Fusco
+  Produced by: Alien Productions
+  Rights:      ALF and the character's likeness belong to their rights holders.
+               This project is not affiliated with, sponsored by or endorsed by
+               them, and claims no rights in the character.
+
+All three are stored in GordonOS's own formats -- a custom-glyph banner, and two
+160x200 multicolour conversions of a photograph of the character, one in colour
+and one in the palette's greys -- and are included as sample content only: a
+boot banner, and the pictures `grview` and `grpaint` open to show what the
+picture format carries.
+
+**This use is claimed as fair use.** GordonOS is a free, non-commercial hobby
+project: it is distributed under the GNU GPL at no charge, it carries no
+advertising, no ALF-related asset is sold, and none is used as a trademark or to
+suggest endorsement. The three images are a small, incidental and heavily
+reduced part of the work; they are not a substitute for the series or for the
+photograph they were made from; and they are included for a non-commercial
+purpose only. Anyone redistributing GordonOS commercially should remove these
+three assets and obtain their own permission from the rights holders for any
+other use.
+

@@ -575,6 +575,3 @@ run basic          ← launch BASIC using the REU working file basicwrk
   to make room for it.
 - **`dir`**, **`save`**, and **`load`** use the REU filesystem; saved
   programs persist across reboots.
-
-Related documentation in the source repository: `quick-start.md` (example
-sessions) and `programmers-guide.md` (task writing).

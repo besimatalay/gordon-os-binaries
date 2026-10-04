@@ -5,6 +5,9 @@
 speed setting at all. Each declares its machine's speed in its own `boot.bat` — see the note
 on `speed` below. They differ in that one line and nothing else.
 
+> **VICE on Linux:** Debian/Ubuntu's package ships no C64 ROMs, so `x64sc` exits at once
+> unless VICE is told where they are. See *Running VICE on Linux* in [README.md](README.md).
+
 After boot you land in the shell (a blinking block cursor). The shell is
 itself a dynamic task (`shell.tsk`) loaded from the REU filesystem by the
 boot task.

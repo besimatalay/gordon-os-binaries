@@ -154,9 +154,8 @@ own control-port option accepts (`3` is its number). In the GUI it is *Control p
 control port 2 → **Mouse (1351)**.
 - `-mouse` is VICE's `Mouse` resource, the host-pointer grab. **Without it the POT bytes stay
 frozen and the buttons read released**, so the control-port device alone is not enough. In the
-GUI it is VICE's mouse-grab setting.
-- **Attach it before the machine starts**: VICE's own note is that attaching a mouse afterwards
-needs a reset.
+  GUI it is VICE's mouse-grab setting. **Alt-M toggles the grab while VICE runs** (`Command-M` on
+  macOS) — press it to get the host pointer back without quitting.
 
 Then declare it at the shell — `mouse 1351` — and `run grpaint shot` will take the pointer. A
 joystick can go back into port 2 when you are done.
@@ -191,6 +190,31 @@ you `save` in GordonOS persist. Or drag `gordon-os.prg` into the VICE window,
 then load the image via **Settings > Cartridges > RAM Expansion Module >
 16384K > Browse**, select `REU.bin`, and check **"Write image on detach/emulator
 exit"** there so saved files persist.
+
+### Running VICE on Linux
+
+Debian/Ubuntu builds VICE `+dfsg`, which ships no C64 ROM images — `x64sc`
+exits at once with `Couldn't load kernal ROM` unless it can find them. VICE
+needs `kernal-901227-03.bin`, `basic-901226-01.bin` and `chargen-901225-01.bin`;
+they come with the official VICE distribution. Put them in VICE's default
+location (`~/.local/share/vice/C64/`), or give VICE a colon-separated search
+path with `-directory`:
+
+```bash
+x64sc -directory ~/.local/share/vice:/usr/share/vice \
+      -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin \
+      -reuimagerw gordon-os.prg
+```
+
+`~` is expanded by the shell on a command line but not by VICE itself — in a
+config file or a VS Code setting, use an absolute path, e.g.
+`-directory /home/you/.local/share/vice:/usr/share/vice`. When VS Code runs as
+a **snap** its `XDG_DATA_HOME` points inside the snap, so VICE looks there
+instead of your home; set `"vs64.viceArgs"` in `.vscode/settings.json` to the
+`-directory` path above.
+
+VICE 3.10 or later is recommended (3.7 is the minimum for the debugger's binary
+monitor).
 
 ## Run on a C64 Ultimate / Ultimate 64
 

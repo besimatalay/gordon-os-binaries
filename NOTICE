@@ -51,6 +51,21 @@ license. This component is included as a user-loadable music player;
 redistribution is at the user's own discretion with respect to this
 component.
 
+Enhanced Sidplayer Editor (reference/sideditor64.asm)
+-----------------------------------------------------
+`reference/sideditor64.asm` is a disassembly of "Enhanced Sidplayer Editor 64
+V1.0" by Craig Chamberlain -- the editor for the same .mus format, and by the
+same author as the player above. It was taken from the Compute's Gazette Sid
+Collection release 1.47, disk 00_Commodore64 (MusicSys.d64, program
+EDITOR2.64), and it carries the notice "COPYRIGHT 1986 BY COMPUTE!
+PUBLICATIONS, INC.".
+
+It is kept for study only: it is not built, it is not part of the published
+binaries, and no code is taken from it (`docs/plans/mus-editor-plan.md`
+records why the editor is not portable to GordonOS). As with the 1986 player,
+the original does not carry an explicit license, so redistribution is at the
+user's own discretion with respect to this component.
+
 Compute's Gazette Sid Collection (CGSC) tunes -- gorkanoid
 ---------------------------------------------------------
 `music/katmand.mus`, `music/immig.mus` and `music/firstdt.mus` are tunes from

@@ -427,8 +427,8 @@ from the task-author's side, with the add-a-task walkthrough.
 
 ### What the binaries repo receives
 
-`publish-binaries.ps1` copies a fixed set and nothing else: the kernel PRG, the two REU
-images, five text files, and the screenshots those text files embed.
+`publish-binaries.ps1` copies the artifacts, the two text files that describe them, and the
+documentation: the application guides and, transitively, every doc those guides link to.
 
 | In the binaries repo | Copied from | Note |
 |---|---|---|
@@ -438,30 +438,44 @@ images, five text files, and the screenshots those text files embed.
 | `quickstart.binaries.md` | `tools/quickstart.binaries.md` | at the root |
 | `NOTICE` | `NOTICE` | |
 | `LICENSE.md` | `docs/LICENSE.md` | moved to the root |
-| `docs/gordonbasic.md` | `docs/gordonbasic.md` | the only doc kept under `docs/` |
-| `docs/img/` | `docs/img/` | the screenshots — addressed as `docs/img/<name>` by the two root-level files and as `img/<name>` by `docs/gordonbasic.md` |
+| `docs/*.md` | `docs/` | the guides' link closure — see below |
+| `reference/` | `reference/tetris/UPSTREAM.md`, `reference/sidplayer-how-it-works.md` | two provenance notes the guides cite |
+| `docs/img/` | `docs/img/` | the screenshots — addressed as `docs/img/<name>` by the two root-level files and as `img/<name>` by a guide under `docs/` |
 
 The screenshots go to `docs/img/` rather than the root because that is the one place where
 **both** spellings resolve: the published `README.md` and `quickstart.binaries.md` sit at
-the repo root, while the copied `docs/gordonbasic.md` keeps the relative path its source
-already uses. The folder is replaced on every publish, so an image deleted from the source
-does not linger in the binaries repo.
+the repo root, while a guide under `docs/` keeps the relative path its source already uses.
+The folder is replaced on every publish, so an image deleted from the source does not linger
+in the binaries repo.
 
 The PRG and the two REU images are written with `Split-Path -Leaf`, so all three land at
 the binaries repo's **root** — the `build/` and `reu/` directories exist only in the source
 repo, and the published text names them without a directory for that reason.
 
+**The doc set is computed, not listed.** The seeds are the five application guides
+(`edit`, `gordonpaint`, `gortris`, `grknoid`, `gordonbasic`); from each, every `](target.md)`
+link is followed in turn, so a guide that gains a link to another doc pulls that doc in on
+its own. `docs/` is *replaced* on each publish, never merged, for the same reason `docs/img/`
+is: a doc that leaves the closure must not linger. Two things stay out by construction —
+`bugs.md` (the kernel's bug history, developer material) and `plans/` — and `LICENSE.md` is
+copied to the root separately. The publish prints the count and names any link that cannot
+resolve there.
+
 `gordonOS-demo.mp4` sits in the clone but is not in this list. Publishing commits whatever
 the clone holds (`git add -A`), so a file placed there by hand survives a publish untouched.
 
-⚠️ **The published text may reference only that set.** The binaries repo carries no other
-documentation, so a `docs/kernel.md`, `tools/` or `reference/` pointer in one of those files
-is a dead link for every reader who has the binaries and not the source. Where the source doc
-said something the binaries reader needs, state it in the file; where the pointer carried
-nothing, drop it. Relative links are the second trap: `README.md` and `quickstart.binaries.md`
-land at the binaries repo's **root** while `docs/gordonbasic.md` stays under `docs/`, so a
-cross-link between them that is correct in one tree is wrong in the other — the published
-files avoid linking to each other across that boundary.
+⚠️ **A pointer resolves only if its target is inside the shipped set.** Since the guides
+ship as a closure, a link from one shipped doc to another always resolves — `docs/kernel.md`,
+`docs/lib-filesys.md`, `docs/quick-start.md` are all reachable from a guide and travel with
+it. What cannot resolve is a pointer *out* of `docs/`: `src/`, `tools/`, `assets/`,
+`reference/*.asm` and `CONTRIBUTING.md` exist only in the source repo. Six such pointers ship
+(`kernel-call-inventory.md` → four `src/kernel/` files, `lib-fp.md` → `src/tasks/dynamic/fpdemo.asm`,
+`tutorial.md` → `../CONTRIBUTING.md`), and they are deliberate: each names where the code under
+discussion lives, which is meaningful the moment a reader has the source, and all six sit in
+developer-reference docs rather than in an application guide. `NOTICE` and the two
+`reference/` notes are copied precisely because guides cite them.
+Relative links are the second trap: a root-level file and a guide under `docs/` address the
+same image differently, which is why `docs/img/` is the shared spelling rather than the root.
 
 ### Driving the emulator from a script
 

@@ -33,6 +33,13 @@ derivative works is permitted for non commercial use.
 
 For commercial use please contact Lee Davison for conditions.
 
+EhBASIC monitor (reference/minimon.asm)
+---------------------------------------
+`reference/minimon.asm` is Lee Davison's minimal monitor for EhBASIC on his 6502
+simulator -- the tool his EhBASIC release ships to load and run the interpreter.
+It is kept for study, is not built, imported or linked, and is covered by the
+EhBASIC terms above.
+
 Enhanced SID Player (.mus player)
 ---------------------------------
 The `sidplay` task (`src/libs/sidplay.inc`) is a port of the
@@ -49,6 +56,15 @@ https://github.com/MyDeveloperThoughts/ComputeSidPlayerC64Source
 Neither the 1986 original nor the 2025 disassembly carries an explicit
 license. This component is included as a user-loadable music player;
 redistribution is at the user's own discretion with respect to this
+component.
+
+Enhanced SID Player disassembly (reference/sidobj64.asm)
+--------------------------------------------------------
+`reference/sidobj64.asm` is Chris Zinn's disassembly of the 1986 player (the
+"ComputeSidPlayerC64Source" above), kept in Kick Assembler format as the
+reference the `sidplay` task was written from. The port itself is
+`src/libs/sidplay.inc`; the reference is not built, imported or linked, and
+redistribution of it is at the user's own discretion with respect to this
 component.
 
 Enhanced Sidplayer Editor (reference/sideditor64.asm)

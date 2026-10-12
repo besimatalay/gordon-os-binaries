@@ -272,4 +272,4 @@ so no drone is left behind, but the music child is parked rather than reaped gra
 - `lib-sid.md` — the player the music child calls, and the SID claim
 - `programmers-guide.md` — gortris as the worked example for a music thread child, a yielding prompt and the joystick read
 - `writing-relocatable-tasks.md` — the flags a pinned, non-re-runnable task sets
-- [../reference/tetris/UPSTREAM.md](../reference/tetris/UPSTREAM.md) — the reference this port came from
+- `../reference/tetris/UPSTREAM.md` — the reference this port came from

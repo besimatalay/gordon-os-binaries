@@ -1,5 +1,7 @@
 # Gordon Basic
 
+![Gordon Basic running a line](img/basic.png)
+
 > **Gordon Basic v1.5** — the built-in BASIC interpreter for GordonOS.
 
 Gordon Basic is a full floating-point Microsoft BASIC 2.0-compatible

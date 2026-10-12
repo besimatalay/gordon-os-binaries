@@ -27,9 +27,12 @@ in binary distributions. See `NOTICE` file for details.
 `ComputeSidPlayerC64Source` repository. Neither the original nor the
 disassembly carries an explicit license. See `NOTICE` for details.
 
-All original GordonOS code remains under GPL-2.0. EhBASIC is included
-under its original author's terms; the Enhanced SID Player is included
-with no explicit license (see `NOTICE`).
+**The GPL-2.0 grant covers the original GordonOS code only.** The components
+above are excluded from it and carry their own, more restrictive terms, which
+the published binaries inherit: EhBASIC is **non-commercial use only**, and the
+Enhanced SID Player carries **no licence at all**. The canonical copy of the
+GPL-2.0 text is the repository-root `LICENSE`; see `NOTICE` for the full
+component-by-component terms.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

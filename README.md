@@ -7,6 +7,28 @@ system kernel for the Commodore 64 with a RAM Expansion Unit (REU). This
 repository contains only the binaries needed to *run* GordonOS - source code
 is not included here.
 
+## Screenshots
+
+Captured from a real VICE run of the binaries in this repository - what you see below is
+what you get by following the [quick start](quickstart.binaries.md).
+
+![GordonOS booting, banner and shell prompt](docs/img/boot.png)
+
+| | |
+|---|---|
+| ![the shell](docs/img/shell-session.png) | ![the task pool](docs/img/pool.png) |
+| `ver`, `me` and `ps` at the shell | `pool`: 109 pool pages, the libraries at the top |
+| ![GordonPaint on a new canvas](docs/img/grpaint-new.png) | ![the editor](docs/img/edit.png) |
+| **GordonPaint**, a new canvas with the band up | the **editor**, status bar and all |
+| ![gortris](docs/img/gortris-play.png) | ![gorkanoid](docs/img/grknoid-play.png) |
+| **gortris**: three pieces landed, one falling | **gorkanoid**: a damaged wall, ball in play |
+| ![gfxdemo](docs/img/gfxdemo.png) | ![spirog](docs/img/spirog.png) |
+| **gfxdemo**: a spider-web weave drawn with `kLine` | **spirog**: a hypotrochoid from an integer sine table |
+| ![sprdemo](docs/img/sprdemo.png) | ![dir *.com](docs/img/dir-com.png) |
+| **sprdemo**: eight sprite balls, per-pixel collision | `dir *.com`: the commands in the image |
+| ![Gordon Basic](docs/img/basic.png) | ![granim](docs/img/granim.gif) |
+| **Gordon Basic** ([language reference](docs/gordonbasic.md)) | **granim**: 360 frames at 24 fps out of the REU |
+
 ## The files
 
 | File | What it is |
@@ -249,6 +271,10 @@ Finally, return to the file browser, select `gordon-os.prg`, press **Return**
 and choose **Run** (DMA load) to start GordonOS.
 
 ### The 1351 mouse (GordonPaint)
+
+![the paint program with a picture loaded, band up and pointer visible](docs/img/grpaint.png)
+
+![the mtest readout, with a 1351 attached](docs/img/mtest.png)
 `grpaint` — the paint program — is mouse-only and refuses to start without a 1351: it prints
 `? mouse off - run 'mouse 1351'` and waits for a key. There are two ways to give it one:
 

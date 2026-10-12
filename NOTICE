@@ -61,8 +61,7 @@ EDITOR2.64), and it carries the notice "COPYRIGHT 1986 BY COMPUTE!
 PUBLICATIONS, INC.".
 
 It is kept for study only: it is not built, it is not part of the published
-binaries, and no code is taken from it (`docs/plans/mus-editor-plan.md`
-records why the editor is not portable to GordonOS). As with the 1986 player,
+binaries, and no code is taken from it. As with the 1986 player,
 the original does not carry an explicit license, so redistribution is at the
 user's own discretion with respect to this component.
 

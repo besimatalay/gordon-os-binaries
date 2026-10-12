@@ -29,6 +29,22 @@ what you get by following the [quick start](quickstart.binaries.md).
 | ![Gordon Basic](docs/img/basic.png) | ![granim](docs/img/granim.gif) |
 | **Gordon Basic** ([language reference](docs/gordonbasic.md)) | **granim**: 360 frames at 24 fps out of the REU |
 
+## Guides
+
+The full documentation ships with these binaries, under `docs/` — the application guides
+first, then the references they point into:
+
+| Guide | Covers |
+|---|---|
+| [quickstart.binaries.md](quickstart.binaries.md) | every command, with example sessions |
+| [docs/edit.md](docs/edit.md) | the text editor: every key, the document model, and what a save does about failure |
+| [docs/gordonpaint.md](docs/gordonpaint.md) | GordonPaint: the band, the thirteen tiles, the undo ring, and how it works |
+| [docs/gortris.md](docs/gortris.md) | Tetris: the screens, the controls, the scoring tables and the hi-score editor |
+| [docs/grknoid.md](docs/grknoid.md) | Gorkanoid: the wall, the paddle, the bounce rule, lives and levels |
+| [docs/gordonbasic.md](docs/gordonbasic.md) | Gordon Basic: the language, the filesystem and the graphics commands |
+| [docs/pic-format.md](docs/pic-format.md) | the `.pic` picture format, byte by byte |
+| [docs/features.md](docs/features.md) | everything the OS offers, subsystem by subsystem |
+
 ## The files
 
 | File | What it is |

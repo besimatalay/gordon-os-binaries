@@ -156,6 +156,10 @@ All 15 are bundled in the REU image. `run <name>` loads `<name>.tsk`:
 
 ![grview: the same picture file in multicolour](docs/img/grview-mc.png)
 
+Three of the bundled tasks have full guides under `docs/`: [the editor](docs/edit.md),
+[Tetris](docs/gortris.md) and [Gorkanoid](docs/grknoid.md) — plus
+[GordonPaint](docs/gordonpaint.md), which is mouse-only.
+
 ## `.lib` shared libraries
 
 These nine library files are bundled in the REU image and are loaded

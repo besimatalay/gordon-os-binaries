@@ -136,7 +136,7 @@ no document to fall back to, so the same failure reports, waits for a key, hands
 display back and exits.
 
 Because the document is unsaved work, `edit` is **`KF_NOT_EVICTABLE`**: `dlEvict` never
-swaps it out (see [dynamic-libraries.md](dynamic-libraries.md)). The consequence is worth
+swaps it out (see `dynamic-libraries.md`). The consequence is worth
 knowing: if every resident task is pinned, a load that needs the pool fails with
 `? no space in pool` rather than evicting one of them.
 
@@ -205,7 +205,7 @@ rejected, so a larger file is truncated (and a save then writes the truncated do
 
 ## See also
 
-- [quick-start.md](quick-start.md) — `run edit` as a shell command, and `type` for reading a file back
-- [dynamic-libraries.md](dynamic-libraries.md) — eviction, `libMask` and what `KF_NOT_EVICTABLE` costs
-- [lib-filesys.md](lib-filesys.md) — the calls a load and a save are built on
+- `quick-start.md` — `run edit` as a shell command, and `type` for reading a file back
+- `dynamic-libraries.md` — eviction, `libMask` and what `KF_NOT_EVICTABLE` costs
+- `lib-filesys.md` — the calls a load and a save are built on
 - [gordonbasic.md](gordonbasic.md) — the other full-screen application in the image

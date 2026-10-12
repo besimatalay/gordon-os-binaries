@@ -268,8 +268,8 @@ so no drone is left behind, but the music child is parked rather than reaped gra
 
 ## See also
 
-- [quick-start.md](quick-start.md) — `run gortris` as a shell command
-- [lib-sid.md](lib-sid.md) — the player the music child calls, and the SID claim
-- [programmers-guide.md](programmers-guide.md) — gortris as the worked example for a music thread child, a yielding prompt and the joystick read
-- [writing-relocatable-tasks.md](writing-relocatable-tasks.md) — the flags a pinned, non-re-runnable task sets
+- `quick-start.md` — `run gortris` as a shell command
+- `lib-sid.md` — the player the music child calls, and the SID claim
+- `programmers-guide.md` — gortris as the worked example for a music thread child, a yielding prompt and the joystick read
+- `writing-relocatable-tasks.md` — the flags a pinned, non-re-runnable task sets
 - [../reference/tetris/UPSTREAM.md](../reference/tetris/UPSTREAM.md) — the reference this port came from

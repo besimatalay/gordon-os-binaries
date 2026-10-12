@@ -10,7 +10,7 @@
 | **Start** | `run grpaint <name> [border bg fg \| border bg c1 c2 c3]` |
 | **Input** | a **1351 mouse on control port 2** — without it the program refuses to start |
 | **Display** | its own **bitmap** surface, the whole screen, with the band over the bottom two cell rows |
-| **Files** | `<name>.pic` (10,032 bytes — [pic-format.md](pic-format.md)); the band's own face is `gpui.bin` / `gpui_mc.bin` |
+| **Files** | `<name>.pic` (10,032 bytes — `pic-format.md`); the band's own face is `gpui.bin` / `gpui_mc.bin` |
 | **Libraries** | `gfx.lib`, `sprite.lib`, `mouse.lib`, `filesys.lib` |
 | **Footprint** | **71 of the pool's 109 pages** when running (31 code + 27 gfx + 1 sprite + 2 mouse + 10 filesys) |
 | **Source** | `src/tasks/dynamic/grpaint.inc`, wrapped by `grpaint.asm` |
@@ -209,7 +209,7 @@ refuse, and it promises nothing.
 
 ### Loading and saving
 
-`<name>.pic` is the 10,032-byte format [pic-format.md](pic-format.md) describes: the mode
+`<name>.pic` is the 10,032-byte format `pic-format.md` describes: the mode
 and the four colours are in its header, and the three payload regions are DMA'd straight
 in — which is also why the canvas is allocated in its **final** mode: the picture's own
 mode and colours are settled from the file (or from the command line) *before* the surface
@@ -237,7 +237,7 @@ read back as a colour or a mode.
 - **The history needs the REU's top full bank**; without it everything else works and there
   is simply no undo.
 - **The MODE tile refills cells from the palette**, so a mode switch reinterprets the same
-  bytes rather than converting the picture — see [pic-format.md](pic-format.md).
+  bytes rather than converting the picture — see `pic-format.md`.
 - **The flood fill reads the region out of the canvas**, and it only arms while the band is
   *down* — an armed fill with the band up would treat the band as part of the picture.
 - **View it with `grview`** (`run grview hires` opens `hires.pic`: the suffix is appended,
@@ -247,8 +247,8 @@ read back as a colour or a mode.
 
 ## See also
 
-- [pic-format.md](pic-format.md) — the `.pic` file the program saves, byte by byte
-- [lib-mouse.md](lib-mouse.md) — the 1351 the pointer is read from, and the noise it brings
-- [lib-sprite.md](lib-sprite.md) — the sprite calls the pointer is drawn with
-- [lib-gfx.md](lib-gfx.md) — `kPlot`, the flood fill and the rest of what draws the canvas
-- [quick-start.md](quick-start.md) — `run grpaint` as a shell command, and the VICE 1351 flags
+- `pic-format.md` — the `.pic` file the program saves, byte by byte
+- `lib-mouse.md` — the 1351 the pointer is read from, and the noise it brings
+- `lib-sprite.md` — the sprite calls the pointer is drawn with
+- `lib-gfx.md` — `kPlot`, the flood fill and the rest of what draws the canvas
+- `quick-start.md` — `run grpaint` as a shell command, and the VICE 1351 flags

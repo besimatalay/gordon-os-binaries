@@ -303,7 +303,7 @@ switched off per screen, and the kernel swaps the whole per-task sprite state wi
 
 ## See also
 
-- [quick-start.md](quick-start.md) — `run grknoid` as a shell command
-- [lib-sprite.md](lib-sprite.md) — the sprite calls the paddle and ball are built on, and how the state is swapped with the display
-- [lib-sid.md](lib-sid.md) — the player the music child calls, and what happens when another task holds the chip
+- `quick-start.md` — `run grknoid` as a shell command
+- `lib-sprite.md` — the sprite calls the paddle and ball are built on, and how the state is swapped with the display
+- `lib-sid.md` — the player the music child calls, and what happens when another task holds the chip
 - [../NOTICE](../NOTICE) — the Compute's Gazette Sid Collection credit for the three tunes

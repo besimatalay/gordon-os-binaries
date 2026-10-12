@@ -31,8 +31,8 @@ what you get by following the [quick start](quickstart.binaries.md).
 
 ## Guides
 
-The full documentation ships with these binaries, under `docs/` — the application guides
-first, then the references they point into:
+The application guides ship with these binaries, under `docs/` — the programs this image
+carries, plus the language reference:
 
 | Guide | Covers |
 |---|---|
@@ -42,8 +42,6 @@ first, then the references they point into:
 | [docs/gortris.md](docs/gortris.md) | Tetris: the screens, the controls, the scoring tables and the hi-score editor |
 | [docs/grknoid.md](docs/grknoid.md) | Gorkanoid: the wall, the paddle, the bounce rule, lives and levels |
 | [docs/gordonbasic.md](docs/gordonbasic.md) | Gordon Basic: the language, the filesystem and the graphics commands |
-| [docs/pic-format.md](docs/pic-format.md) | the `.pic` picture format, byte by byte |
-| [docs/features.md](docs/features.md) | everything the OS offers, subsystem by subsystem |
 
 ## The files
 

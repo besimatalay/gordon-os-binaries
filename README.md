@@ -2,6 +2,10 @@
 
 > Preemptive multitasking kernel for the Commodore 64 with REU — **v1.0 beta**
 
+![GordonOS booting, banner and shell prompt](docs/img/boot.png)
+
+*A fresh boot: the banner, `gordonOS v1.0b1`, and the shell's first prompt.*
+
 Prebuilt binaries for **GordonOS**, a preemptive multitasking operating
 system kernel for the Commodore 64 with a RAM Expansion Unit (REU). This
 repository contains only the binaries needed to *run* GordonOS - source code
@@ -11,8 +15,6 @@ is not included here.
 
 Captured from a real VICE run of the binaries in this repository - what you see below is
 what you get by following the [quick start](quickstart.binaries.md).
-
-![GordonOS booting, banner and shell prompt](docs/img/boot.png)
 
 | | |
 |---|---|
@@ -338,7 +340,8 @@ see `NOTICE` before redistributing.
 
 ## Contact
 
-The GordonOS source repository is **not public yet** — the system is still in
-active development. If you'd like to contribute, or have help, suggestions, or
-code to offer, contact **Besim Atalay** at
+The source, the documentation and the issue tracker are at
+**[github.com/GordonOS/gordon-os](https://github.com/GordonOS/gordon-os)** — the
+system is still in active development, and contributions are welcome. To write
+directly, contact **Besim Atalay** at
 [besim.atalay@gmail.com](mailto:besim.atalay@gmail.com).

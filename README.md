@@ -171,8 +171,8 @@ the REU filesystem.
 
 ## Run it with VICE
 
-Requires [VICE](https://vice-emu.sourceforge.io/) **3.10 or later** (`x64sc`)
-with REU support. Older versions use the removed `-reuimagesize` flag.
+Requires [VICE](https://vice-emu.sourceforge.io/) **3.9 or later** (`x64sc`)
+with REU support.
 
 ```bash
 x64sc -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw gordon-os.prg
@@ -259,8 +259,7 @@ a **snap** its `XDG_DATA_HOME` points inside the snap, so VICE looks there
 instead of your home; set `"vs64.viceArgs"` in `.vscode/settings.json` to the
 `-directory` path above.
 
-VICE 3.10 or later is recommended (3.7 is the minimum for the debugger's binary
-monitor).
+VICE 3.9 or later is required.
 
 ## Run on a C64 Ultimate / Ultimate 64
 

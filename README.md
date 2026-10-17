@@ -341,6 +341,8 @@ see `NOTICE` before redistributing.
 
 The source, the documentation and the issue tracker are at
 **[github.com/GordonOS/gordon-os](https://github.com/GordonOS/gordon-os)** — the
-system is still in active development, and contributions are welcome. To write
+system is still in active development, and contributions are welcome. Development
+is also discussed in the **GordonOS Development** Facebook group — a private group,
+request to join: <https://www.facebook.com/groups/1486946993399861>. To write
 directly, contact **Besim Atalay** at
 [besim.atalay@gmail.com](mailto:besim.atalay@gmail.com).

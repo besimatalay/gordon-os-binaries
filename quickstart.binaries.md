@@ -7,6 +7,11 @@ on `speed` below. They differ in that one line and nothing else.
 
 > **VICE on Linux:** Debian/Ubuntu's package ships no C64 ROMs, so `x64sc` exits at once
 > unless VICE is told where they are. See *Running VICE on Linux* in [README.md](README.md).
+>
+> **Always pass `-autostartprgmode 1`** (direct RAM injection). VICE's default autostart
+> loads the PRG through the KERNAL, which cannot place a program that spans `$0801-$FF9E`,
+> so the screen stays black and the console shows `AUTOSTART: Entered ROM at $e5d1`.
+> Setting `AutostartPrgMode=1` in VICE's config file has the same effect.
 
 After boot you land in the shell (a blinking block cursor). The shell is
 itself a dynamic task (`shell.tsk`) loaded from the REU filesystem by the

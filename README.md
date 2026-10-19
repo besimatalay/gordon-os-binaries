@@ -175,8 +175,14 @@ Requires [VICE](https://vice-emu.sourceforge.io/) **3.9 or later** (`x64sc`)
 with REU support.
 
 ```bash
-x64sc -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw gordon-os.prg
+x64sc -autostartprgmode 1 -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw gordon-os.prg
 ```
+
+> **A black screen, with `AUTOSTART: Entered ROM at $e5d1` in the console, means
+> `-autostartprgmode 1` is missing.** VICE's default autostart loads the PRG through the
+> KERNAL, which cannot place a program that spans `$0801-$FF9E` — writes into the ROM and
+> I/O banks are lost — so the kernel never runs. The flag injects the PRG straight into
+> RAM. (Setting `AutostartPrgMode=1` in VICE's config file does the same.)
 
 `-speed 200` runs VICE at 200% of real time, which is what **`REU.bin` is built for**.
 The OS keeps the machine's speed in one runtime setting — **`speed <percent>`**, declared
@@ -191,7 +197,7 @@ drives its pointer sprite from a Commodore **1351** in control port 2, so start 
 device *and* the host-pointer grab:
 
 ```bash
-x64sc -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw \
+x64sc -autostartprgmode 1 -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin -reuimagerw \
       -controlport2device 1351 -mouse gordon-os.prg
 ```
 
@@ -248,7 +254,7 @@ path with `-directory`:
 
 ```bash
 x64sc -directory ~/.local/share/vice:/usr/share/vice \
-      -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin \
+      -autostartprgmode 1 -speed 200 -reu -reusize 16384 -reuimage /absolute/path/to/REU.bin \
       -reuimagerw gordon-os.prg
 ```
 

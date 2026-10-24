@@ -11,7 +11,7 @@
 | **Display** | its own surface, whole screen (row 24 included), own colours |
 | **Files** | `gortris.hi` (3 × 10 bytes); the tune `tetris.mus` |
 | **Libraries** | `filesys.lib` (lazy: the hi-score table) + `sid.lib` (lazy: the music) |
-| **Footprint** | 24 code pages + 10 + 13 + a 4-page tune buffer ≈ **51 of the pool's 109 pages** |
+| **Footprint** | 24 code pages + 10 + 14 + the 3 tune windows ≈ **51 of the pool's 109 pages** |
 | **Source** | `src/tasks/dynamic/gortris.inc`, wrapped by `gortris.asm` |
 
 **Provenance.** The game logic is a port of Wiebo de Wit's `wiebow/tetris.c64` (MIT) — the
@@ -219,7 +219,7 @@ the game gets it again and again. Do not add a loop to the file, or the voices n
 
 Switching the music off is **`kSidHush`, not just a flag** — the child is parked inside the
 player's sleep loop and the hush is what breaks it out. Leaving is: set the quit flag, hush,
-**reap the child** (up to 60 yields, then `SYS_KILL`), and only then free the tune buffer —
+**reap the child** (up to 60 yields, then `SYS_KILL`), and only then free the window pages —
 the child may still hold the pointer, and a thread child shares this code page, so it must not
 outlive the task. `m` is a player preference: the music stays off across a focus regain or a
 mode change.
@@ -250,10 +250,12 @@ so no drone is left behind, but the music child is parked rather than reaped gra
 - **Pinned and single-instance.** It owns the display and holds its board, so eviction is not
   an option — the loader's restore would restart it cold. A second `run gortris` gets
   `? already running`.
-- **≈51 of the pool's 109 pages while it is live** (24 code + 10 `filesys.lib` + 13 `sid.lib`
-  + a 4-page tune buffer), and it holds both libraries for the whole session because the
-  hi-score table has to be *written* — which is what `tools/check-pool-budget.ps1` reports:
-  **51** (24 code + 10 `filesys.lib` + 13 `sid.lib` + a 4-page tune block).
+- **≈51 of the pool's 109 pages while it is live** (24 code + 10 `filesys.lib` + 14 `sid.lib`
+  + the three 256-byte tune windows), and it holds both libraries for the whole session because
+  the hi-score table has to be *written* — which is what `tools/check-pool-budget.ps1` reports:
+  **51** (24 code + 10 `filesys.lib` + 14 `sid.lib` + a 3-page window block).
+- **The tune is streamed**, so its size costs nothing: the file stays in the REU and `sid.lib`
+  pages it in, three 256-byte windows for the whole session.
 - **No lives, and no lock delay:** a blocked soft drop locks on the next frame, and a piece
   that does not fit at spawn ends the game at once.
 - **Levels can pass 9 in play** (the delay floors at 4, and the two-digit printer handles

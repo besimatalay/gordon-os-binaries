@@ -12,7 +12,7 @@
 | **Display** | its own hires bitmap surface, whole screen, border blue |
 | **Files** | `grknoid.hi` (3 × 10 bytes); the sheets `gkpad.spr` / `gkball.spr`; the tunes `katmand.mus`, `immig.mus`, `firstdt.mus` |
 | **Libraries** | `sprite.lib` (eager) + `filesys.lib` and `sid.lib` (lazy) |
-| **Footprint** | 19 code pages + 1 + 13 + 10 + an **18-page** tune buffer ≈ **61 of the pool's 109 pages** |
+| **Footprint** | 19 code pages + 1 + 14 + 10 + the 3 tune windows ≈ **47 of the pool's 109 pages** |
 | **Source** | `src/tasks/dynamic/grknoid.inc`, wrapped by `grknoid.asm` |
 
 **Provenance.** Unlike `gortris`, nothing here is ported: the game, the art and the chrome
@@ -241,14 +241,15 @@ One **thread child** plays all three tunes, for the same reason `gortris` has on
 blocks, so the game loop cannot call it. The child declares its **own** ZP window (`$02-$0A`,
 sid.lib's scratch) — a parent's window cannot protect a child's.
 
-Its buffer is **one 18-page `kMalloc` block, taken once at startup and freed on quit** — the
-size of the largest tune. Cycling 18/4/2-page blocks through the pool on every mode change
-would fragment it until the *largest* request failed, so the block is held for the session
-instead; the parent owns it and the child only ever loads *into* it. A tune that will not load
-— missing, unreadable, or **bigger than 18 pages** — is **refused rather than allowed to
-overflow the block**, and the child falls back to the attract tune once, then to silence. It
-does not retry on a timer, and none of this ever prints an error: the worst case is a quiet
-game.
+Its tunes are **streamed, so there is no tune buffer at all**: at startup the task takes a
+single **three-page `kMalloc`** (one 256-byte, page-aligned window per voice) and `sid.lib`
+pages whichever file the mode asks for out of the REU into those windows as the music walks
+through it. A mode change rewrites three bytes of the player's config — the file's
+filesystem offset — and allocates nothing, so the pool sees one request for the whole
+session and the RAM cost does not follow the tune's length (the attract tune is 18 pages if it
+were buffered). A tune that is not in the FS is the only failure left, and the child falls back
+to the attract tune once, then to silence. It does not retry on a timer, and none of this ever
+prints an error: the worst case is a quiet game.
 
 Switching tunes is `kSidHush` **plus** a changed request — the child is inside the player's
 sleep loop, so only the hush makes it return and re-read. The child notes which tune is loaded
@@ -281,17 +282,17 @@ switched off per screen, and the kernel swaps the whole per-task sprite state wi
 
 - **Pinned and single-instance.** Pinning is the point: an eviction would cold-restart a live
   game. A second `run grknoid` gets `? already running`.
-- **≈61 of the pool's 109 pages at peak** (19 code + 1 `sprite.lib` + 13 `sid.lib` + 10
-  `filesys.lib` + the 18-page tune buffer). `tools/check-pool-budget.ps1` reports **61** for
-  it, the tune block included: 19 code + 1 `sprite.lib` + 10 `filesys.lib` + 13 `sid.lib`
-  + the 18-page `kMalloc`.
+- **≈47 of the pool's 109 pages at peak** (19 code + 1 `sprite.lib` + 10 `filesys.lib` + 14
+  `sid.lib` + the three tune windows). `tools/check-pool-budget.ps1` reports **47** for it, the
+  windows included: 19 code + 1 `sprite.lib` + 10 `filesys.lib` + 14 `sid.lib` + a 3-page
+  `kMalloc`.
 - **The joystick is implemented but untested.**
 - **Five levels, then back to level 1** — there is no win screen.
 - **A tie does not displace a hi score**, and **every hi-score save appends**: the filesystem's
   delete is a tombstone, so each save costs a directory slot and 30 fresh bytes, and only
   `format` reclaims them.
-- **A tune larger than 18 pages is silently refused** — a bigger `.mus` needs the buffer raised
-  and gortris-style re-checking.
+- **Any tune the filesystem can hold plays** — streaming has no per-tune size limit, so the
+  ceiling is the FS's 16-bit size field (64 KB), not a pool budget.
 - **The name-entry screen cannot be escaped except with RETURN** (`q` types a letter).
 - **Losing the display freezes the game but the music keeps playing** — unlike `gortris`.
 - **The launch always goes up and to the right.**

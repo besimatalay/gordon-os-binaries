@@ -22,6 +22,8 @@ what you get by following the [quick start](quickstart.binaries.md).
 | `ver`, `me` and `ps` at the shell | `pool`: 109 pool pages, the libraries at the top |
 | ![GordonPaint on a new canvas](docs/img/grpaint-new.png) | ![the editor](docs/img/edit.png) |
 | **GordonPaint**, a new canvas with the band up | the **editor**, status bar and all |
+| ![musedit](docs/img/musedit.png) | ![musedit playing](docs/img/musedit-play.png) |
+| **musedit**: a tune open, the cursor on its command line | **musedit** playing: the head counts rows |
 | ![gortris](docs/img/gortris-play.png) | ![gorkanoid](docs/img/grknoid-play.png) |
 | **gortris**: three pieces landed, one falling | **gorkanoid**: a damaged wall, ball in play |
 | ![gfxdemo](docs/img/gfxdemo.png) | ![spirog](docs/img/spirog.png) |
@@ -43,6 +45,7 @@ carries, plus the language reference:
 | [docs/gordonpaint.md](docs/gordonpaint.md) | GordonPaint: the band, the thirteen tiles, the undo ring, and how it works |
 | [docs/gortris.md](docs/gortris.md) | Tetris: the screens, the controls, the scoring tables and the hi-score editor |
 | [docs/grknoid.md](docs/grknoid.md) | Gorkanoid: the wall, the paddle, the bounce rule, lives and levels |
+| [docs/musedit.md](docs/musedit.md) | The tune editor: every key, every command the format has, playing and saving tunes |
 | [docs/gordonbasic.md](docs/gordonbasic.md) | Gordon Basic: the language, the filesystem and the graphics commands |
 
 ## The files
@@ -119,6 +122,18 @@ Key features:
 - Batch file support as .bat files
 - Dynamic loading of charsets as .fnt files
 - Sprite sheets as .spr files (64-byte frames, frame *N* at file offset *N*×64)
+- **SID Music editor** - `run musedit <tune>` opens a Sidplayer `.mus` from the REU
+  filesystem as a three-voice grid: a note reads as its pitch and its duration on
+  one row (`C-4 16`), a playhead driven by the player's own jiffy clock follows the
+  music a line at a time, and three coloured dots on an eight-octave piano show
+  what each voice is sounding. Editing is by cursor — note keys, armed durations,
+  rests, row insert across all three voices, a command panel covering every effect
+  the format has, jumps by bar, undo/redo — and `SHIFT`+`S` writes the tune back.
+  The score is a 64 KB scratch copy in the REU filesystem, so it can be far longer
+  than the 64 KB the original Sidplayer had to share with its own editor. Twelve
+  tunes ship to try it on, including `ringmod`, `syncmod`, `layla` and `daytrip`;
+  `run sidplay <tune>` plays any of them without the editor — see
+  the [tune editor guide](docs/musedit.md)
 - **GordonPaint** - `run grpaint <name>` is the paint program the mouse exists
   for: a canvas in hires (320x200) or multicolour (160x200), a palette and tool
   band over the bottom two cell rows (thirteen tiles plus the four multicolour

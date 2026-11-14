@@ -81,20 +81,62 @@ binaries, and no code is taken from it. As with the 1986 player,
 the original does not carry an explicit license, so redistribution is at the
 user's own discretion with respect to this component.
 
-Compute's Gazette Sid Collection (CGSC) tunes -- gorkanoid
----------------------------------------------------------
-`music/katmand.mus`, `music/immig.mus` and `music/firstdt.mus` are tunes from
-the Compute's Gazette Sid Collection (CGSC) -- the archive of songs written for
-Compute's Gazette's Sidplayer, which is the same music system as the Enhanced
-SID Player this repository ports (see the entry above). They are played as
-published: a `.mus` file is already a Sidplayer score, so nothing is converted.
+Compute's Gazette Sid Collection (CGSC) tunes
+---------------------------------------------
+Seven of the bundled tunes come from the Compute's Gazette Sid Collection (CGSC)
+-- the archive of songs written for Compute's Gazette's Sidplayer, which is the
+same music system as the Enhanced SID Player this repository ports (see the entry
+above). They are played as published: a `.mus` file is already a Sidplayer score,
+so nothing is converted.
 
 Source: https://www.c64music.co.uk/
 Mirror: archive.org, "Compute's Gazette Sid Collection"
 
-The `grknoid` task plays them one per mode -- katmand in the attract loop,
-immig during a game, firstdt once on the game-over screen -- and credits the
-collection on its attract screen.
+Three of them are the `grknoid` task's music, one per mode -- katmand in the
+attract loop, immig during a game, firstdt once on the game-over screen, credited
+on its attract screen: `music/katmand.mus`, `music/immig.mus` and
+`music/firstdt.mus`.
+
+Two of the archive's demonstration tunes ship as well, renamed to the seven-character
+tune names the editor takes:
+
+  `music/ringmod.mus`  = `Misc/Demonstration/Ring_Modulation_Demonstration.mus`
+  `music/syncmod.mus`  = `Misc/Demonstration/Sync_Mode_Demonstration.mus`
+
+They are the worked examples of ring modulation and oscillator sync, and the `musedit`
+guide points at them as `run musedit ringmod` and `run musedit syncmod`. Their bytes,
+and the description text inside them ("RING MODULATION DEMO", "SYNC MODE DEMO"), are
+as published; the collection does not record an author for either file.
+
+`music/layla.mus` is `Misc/T/Layla.mus`, shipped as the archive's fullest example of the
+player's software oscillator -- the tune the `musedit` guide points at for `LFO`/`MAX`. Its
+own description reads "LAYLA BY ERIC CLAPTON ... THC SID BY TOMMY ... BBS MARCH 31 1989":
+the tune is Eric Clapton's and the SID arrangement is the archive's, credited here exactly
+as the file itself credits it.
+
+`music/daytrip.mus` is `Misc/D/Day_Tripper_A.mus`, the archive's example of a voice that
+modulates from *another voice's envelope* (`SRC 2`) rather than from the software
+oscillator; the guide points at it for that. Its description reads "DAY TRIPPER WRITTEN BY
+LENNON/MC CARTNEY AS PERFORMED BY THE BEATLES SID BY DEEJAY MAS JULY, 1991".
+
+Other Sidplayer-era tunes
+-------------------------
+Four further bundled tunes were not written for this repository. They are played as
+published, and each carries its own credit in the description text stored inside the
+file, printed here exactly as the file holds it:
+
+  `music/commodo.mus`  "TWO PART INVENTION #13 J.S. BACH COURTESY CRAIG CHAMBERLAIN"
+  `music/fsonata.mus`  "SONATINA IN F L. VAN BEETHOVEN DEMONSTRATES WAVEFORMS
+                        COURTESY JERRY BRADY"
+  `music/seffsng.mus`  "RED MUSIC SYSTEM THIS SOUND-EFFECT SONG IS CREATED BY
+                        RED SOFTWARE (C)"
+  `music/tambrn.mus`   "TAMBOURIN ... FROM 'PIECES DE CLAVECIN' ... JEAN-PHILIPPE"
+
+The compositions are long out of copyright -- Bach, Beethoven and, in `tambrn`, Jean-Philippe
+Rameau's *Pieces de Clavecin* -- and what each description records is who made the SID version.
+This repository holds no source note beyond those strings, so they are reproduced as they stand
+and no further claim is made about the arrangements. `run sidplay <name>` plays any of them, and
+`run musedit <name>` opens any of them for editing.
 
 Tetris "A Theme (Korobeiniki)" - sheet music source
 ---------------------------------------------------

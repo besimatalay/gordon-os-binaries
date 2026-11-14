@@ -21,6 +21,10 @@ BASIC's program RAM is a persistent 64 KB REU working file (`basicwrk`) —
 open it with `run basic` (reused if present, created if absent, deleted on
 `exit`).
 
+Everything in the image — a saved BASIC program, a tune, a picture — can be
+copied out to your own computer and put back, with `reufs-gui.py` or `reufs.py`;
+see *Taking a file out of the image* at the end of this guide.
+
 The `.tsk` tasks `gfxdemo`, `fpdemo`, `spirog`, `sprdemo`, `maze`, `clock`, `grview` and
 `granim` are
 **re-runnable**: `run` them multiple times for a fresh copy each time. `sprdemo` is
@@ -202,3 +206,23 @@ in its header):
 
 Screen switching: F1/F3/F5/F7 and Shift+F1/F3/F5/F7 cycle the 8 virtual
 screens. Files in the REU filesystem persist across reboots.
+
+## Taking a file out of the image
+
+Everything GordonOS saves lives **inside `REU.bin`** — there is no disk and no
+serial link, so the image is the disk. `reufs-gui.py` (a window) and `reufs.py`
+(a command line) move files in and out of it from Windows, Linux or macOS. Both
+need Python 3 and nothing else, and both find `REU.bin` beside themselves:
+
+```
+python3 reufs.py ls
+python3 reufs.py get immig.wrk ./immig.wrk
+python3 reufs.py put ./mytune.mus --name mytune.mus
+python3 reufs-gui.py
+```
+
+Names are 1–11 characters **including the extension**; a zero-length file cannot
+be stored; and a deleted file keeps its space until `compact` runs on the
+machine. **Close VICE before changing the image** — the emulator holds it
+mapped, so both tools refuse rather than let the emulator and the file diverge.
+The [README](README.md) has the whole of it, with the GUI walk-through.

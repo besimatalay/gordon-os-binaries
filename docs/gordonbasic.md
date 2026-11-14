@@ -372,6 +372,12 @@ dir              ← lists the filesystem
 Files persist across reboots; you can also see and manage them from the
 shell with `dir`, `del`, `save`, and `load`.
 
+To move a program to another machine, it has to leave the REU image — that is
+where the filesystem lives. `reufs.py get prog.bas <file>` writes one out and
+`reufs.py put <file> --name prog.bas` puts one back, with `reufs-gui.py` doing
+the same from a window. Close VICE first: the emulator holds the image mapped,
+so both refuse to change it while it runs.
+
 ---
 
 ## Graphics

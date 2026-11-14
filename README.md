@@ -35,8 +35,9 @@ what you get by following the [quick start](quickstart.binaries.md).
 
 ## Guides
 
-The application guides ship with these binaries, under `docs/` — the programs this image
-carries, plus the language reference:
+The guides ship with these binaries, under `docs/` — the programs this image
+carries, the language reference, and the reference for moving files in and out of
+the image:
 
 | Guide | Covers |
 |---|---|
@@ -47,6 +48,7 @@ carries, plus the language reference:
 | [docs/grknoid.md](docs/grknoid.md) | Gorkanoid: the wall, the paddle, the bounce rule, lives and levels |
 | [docs/musedit.md](docs/musedit.md) | The tune editor: every key, every command the format has, playing and saving tunes |
 | [docs/gordonbasic.md](docs/gordonbasic.md) | Gordon Basic: the language, the filesystem and the graphics commands |
+| [docs/reufs.md](docs/reufs.md) | Moving files between your computer and the image: the window, the command line, and every rule the filesystem imposes |
 
 ## The files
 
@@ -55,9 +57,48 @@ carries, plus the language reference:
 | `gordon-os.prg` | The kernel. Autostart it in VICE, or on a real machine with an REU. |
 | `REU.bin` | The REU image to boot it with **in VICE**, whose `boot.bat` declares `speed 200` (the 200% fast-forward the launch scripts use) and `mouse 1351` (the pointer is live from the first prompt). |
 | `REU-C64U.bin` | The same image built for a **C64 Ultimate** (or any real machine): `speed 100`. Its turbo raises the CPU speed without moving the SID's clock or the video timing, so a real machine must not be told 200%. |
+| `reufs-gui.py` | A two-pane **file manager** for the image: your computer on the left, the REU filesystem on the right, with Put / Get / Delete. Needs Python 3 (`tkinter` is included with it). |
+| `reufs.py` | The same thing as a command line — `ls`, `get`, `put`, `rm`, `export`, `import` — and the library the window uses. |
 
 The two images differ only in that one declaration, and they are alternatives: boot the
 kernel with one of them.
+
+## Getting files out of the image (and in)
+
+Everything GordonOS saves lives **inside the REU image**: there is no disk and no
+serial link, so the image file *is* the disk. To move a file to another
+machine, take it out of the image; to bring one in, put it back.
+
+```
+python3 reufs-gui.py            ← the window
+python3 reufs.py ls             ← the command line, shown here against REU.bin
+python3 reufs.py get immig.wrk ./immig.wrk
+python3 reufs.py put ./mytune.mus --name mytune.mus
+python3 reufs.py export ./backup
+```
+
+Use `python` instead of `python3` on Windows. Both programs find `REU.bin`
+beside themselves, so they need no arguments to start on the image they ship
+with; pass a path for `REU-C64U.bin` or a copy.
+
+In the window, click a host file on the left and press **Put into image →**, or
+select rows on the right and press **← Get from image**. `Export all` and
+`Import all` move a whole directory.
+
+**Close VICE first for anything that changes the image.** The emulator holds the
+image mapped, and on Linux and macOS a write would succeed and leave the
+emulator running on the old copy — so both tools refuse, and the window says so
+in a banner and disables its buttons. Reading is always allowed, so you can pull
+a file out of a session that is still running.
+
+Three rules come from the filesystem itself: a name is **1–11 characters
+including the extension** (`musedit.tsk` is exactly eleven), a **zero-length file
+cannot exist**, and **deleted files keep their space until `compact` runs on the
+machine** — so run `compact` at the shell after a lot of deletes before copying
+a large file in.
+
+On a **C64 Ultimate**, the REU contents reach the disk only when you save the REU
+memory (see *Persistence* below), so take the files out of the saved image.
 
 ## What is GordonOS?
 
@@ -104,7 +145,10 @@ Key features:
   and multicolor (160x200); `gfx.lib` draws lines/boxes/circles/flood-fill and
   pixel-positioned text, all MC-aware
 - Thread support - tasks can spawn child threads that share the parent's memory
-- REU filesystem - `format`/`save`/`load`/`del`/`rename`/`copy`/`dir`/`type`/`fsinfo`/`compact`, persists across reboots
+- REU filesystem - `format`/`save`/`load`/`del`/`rename`/`copy`/`dir`/`type`/`fsinfo`/`compact`,
+  persists across reboots, and **crosses to the host**: `reufs-gui.py` (a two-pane window) or
+  `reufs.py` (a command line) list, copy out and copy in files from Windows, Linux or macOS —
+  see *Getting files out of the image* above
 - IRQ-driven keyboard - 16-byte ring buffer, key repeat, F-key screen switching
 - Interactive shell - line editing, cursor keys, blinking cursor,
   custom-glyph `.bnr` banners (`banner <file> <row> <col>`), and a machine
@@ -339,6 +383,10 @@ until you export them. Before powering down:
 4. Select **Save REU Memory**.
 5. Enter a filename (e.g. `REU.bin` to overwrite the image) and press Enter to
    write the raw 16 MB block back to the USB drive.
+
+That saved image is a normal file, so `reufs.py` or `reufs-gui.py` can open it
+on a PC and take individual files out of it — the whole image need not be handed
+around. See *Getting files out of the image* above.
 
 ## Quick start
 

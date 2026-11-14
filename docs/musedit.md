@@ -1292,6 +1292,15 @@ While you edit, the tune you are working on lives in a scratch copy called `<nam
 clutter `dir` — and because a deletion only tombstones a file's space, the REU filesystem gives that
 space back when you run `compact`.
 
+**To take a tune off the machine**, it has to come out of the REU image, because that is where the
+filesystem lives. Two host-side programs ship with the image for that: `reufs.py get <name>.mus
+<file>` writes a tune out and `reufs.py put <file> --name <name>.mus` puts one back, while
+`reufs-gui.py` does the same from a two-pane window. Close VICE first — the emulator holds the image
+mapped, so both refuse to change it while it runs (reading is fine, so a tune saved from a running
+session can still be pulled out). A name is at most 11 characters including the extension, and
+`.mus` base names are capped at 7, so a tune out of this editor is a file the machine will accept
+straight back.
+
 ## When musedit says no
 
 Every message the editor can print, and what to do about it:

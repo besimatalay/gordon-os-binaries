@@ -326,7 +326,12 @@ class App:
         def action():
             put = 0
             for path in files:
-                name = os.path.basename(path)
+                wanted = os.path.basename(path)
+                name = reufs.store_name(wanted)
+                if name != wanted:
+                    for line in reufs.name_report(wanted):
+                        self.log(line)
+                    self.log("  '%s' -> '%s'" % (wanted, name))
                 with open(path, "rb") as fh:
                     blob = fh.read()
                 existing = self.fs.find(name)
@@ -426,8 +431,12 @@ class App:
 
         def action():
             added = self.fs.import_from(directory, overwrite=True)
-            for name, size in added:
-                self.log("put %-14s %8s" % (name, fmt_size(size)))
+            for host, stored, size in added:
+                if host != stored:
+                    for line in reufs.name_report(host):
+                        self.log(line)
+                    self.log("  '%s' -> '%s'" % (host, stored))
+                self.log("put %-14s %8s" % (stored, fmt_size(size)))
             if added:
                 self.save()
 

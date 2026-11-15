@@ -221,8 +221,12 @@ python3 reufs.py put ./mytune.mus --name mytune.mus
 python3 reufs-gui.py
 ```
 
-Names are 1–11 characters **including the extension**; a zero-length file cannot
-be stored; and a deleted file keeps its space until `compact` runs on the
-machine. **Close VICE before changing the image** — the emulator holds it
-mapped, so both tools refuse rather than let the emulator and the file diverge.
-The [README](README.md) has the whole of it, with the GUI walk-through.
+Names are 1–11 characters **including the extension**. A character the C64
+keyboard cannot type has no glyph in the font, so it is removed (`Axel_F.mus`
+goes in as `AxelF.mus`), and a longer name is cut to fit with its extension kept
+(`alongname.xxx` becomes `alongna.xxx`) — no need to rename a file first. A
+zero-length file cannot be stored, and a deleted file keeps its space until
+`compact` runs on the machine. **Close VICE before changing the image** — the
+emulator holds it mapped, so both tools refuse rather than let the emulator and
+the file diverge. The [README](README.md) has the whole of it, with the GUI
+walk-through.

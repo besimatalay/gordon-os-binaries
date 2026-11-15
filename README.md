@@ -95,7 +95,10 @@ Three rules come from the filesystem itself: a name is **1–11 characters
 including the extension** (`musedit.tsk` is exactly eleven), a **zero-length file
 cannot exist**, and **deleted files keep their space until `compact` runs on the
 machine** — so run `compact` at the shell after a lot of deletes before copying
-a large file in.
+a large file in. A name is no obstacle either: a character the C64 keyboard
+cannot type has no glyph in the font, so it is removed (`Axel_F.mus` goes in as
+`AxelF.mus`), and a longer name is cut to fit with the extension kept — the
+window and the command line both say so.
 
 On a **C64 Ultimate**, the REU contents reach the disk only when you save the REU
 memory (see *Persistence* below), so take the files out of the saved image.

@@ -223,6 +223,13 @@ second dot with bit 5), which means the mark is the format's own information and
 editor keeps on the side. A note whose onset did not land on a row takes no mark: its lane ends in
 the `?` instead, which is the more important thing about it.
 
+**The 64th is the one length that always wears its dot.** Its class bits are zero, so a plain
+`$00` byte is the one value the player never reads as a length — it skips that event before it
+looks at the class. The dot bit is what makes the byte non-zero, and the player ignores the dot for
+a 64th: it grants the tempo's own short length, which is exactly what a 64th is. So `DUR` landing on
+`64` writes `$20`, the grid draws it as `64.`, and the dot changes nothing about its length — a
+64th is only longer when the triplet mark replaces it.
+
 `TIE` comes straight after the duration, and it means "hold, do not restrike": the player carries
 the sound through into the next event. It is the duration byte's bit 6.
 
@@ -522,9 +529,13 @@ not a multiple of 16, and a triplet at a tempo outside the ten bands
 change the tempo first — and if the piece needs both 16ths and triplets, make the tempo a multiple of
 48 so neither is refused.
 
-One corner a foreign file can carry: a note pair whose duration byte is exactly `$00`. What such a
-pair means is not settled — only the player decides — and this player reads it as a 64th note, so the
-grid draws it as one and writes it back unchanged.
+One corner a foreign file can carry: a note pair whose duration byte is exactly `$00`. It is not a
+length at all — the player tests for it *before* it reads the class and **skips the event**: no time
+passes and the note is never gated, so nothing sounds and the next pair is read at once. The grid
+skips it the same way, so a converted tune can show every one of its bars while a few rows carry no
+note. Such a pair is left exactly as it is, but **musedit will not write a new one**: a length the
+tempo grants is always stored under a byte the player grants, and the 64th therefore arms as `$20`
+— on a 64th the dot is the encoding, not a longer note.
 
 ## Playing
 

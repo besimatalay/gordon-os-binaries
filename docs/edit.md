@@ -181,15 +181,18 @@ follow the same rule.
 (`kReuReadAt`), so the code image holds no buffer for the document. The parser treats a
 CR followed by a NUL as a line break, a CR followed by anything else as the C64's RETURN
 glyph shown literally, and a NUL as a skip. Lines longer than 40 columns are
-**hard-wrapped**, and everything past line 192 is **discarded** — the file is not
-rejected, so a larger file is truncated (and a save then writes the truncated document).
+**hard-wrapped**, and reading stops at line 192 — the file is not rejected, so a larger
+file is truncated, and the status line says `trunc 192` when that happens (a save then
+writes the truncated document, which is what the warning is there to prevent you doing by
+accident).
 
 ---
 
 ## Limits
 
-- **192 lines × 40 columns.** Larger files load truncated, and saving writes what is on
-  screen.
+- **192 lines × 40 columns.** Larger files load truncated and the status line reports
+  `trunc 192`; saving writes what is on screen, so that warning is the only thing that says
+  the tail is not there.
 - **One document per instance, but several instances are allowed** (`KF_RE_RUNNABLE`):
   two `run edit` invocations are two independent editors with their own documents,
   cursors and clipboards.

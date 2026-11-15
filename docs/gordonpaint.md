@@ -10,7 +10,7 @@
 | **Start** | `run grpaint <name> [border bg fg \| border bg c1 c2 c3]` |
 | **Input** | a **1351 mouse on control port 2** — without it the program refuses to start |
 | **Display** | its own **bitmap** surface, the whole screen, with the band over the bottom two cell rows |
-| **Files** | `<name>.pic` (10,032 bytes — `pic-format.md`); the band's own face is `gpui.bin` / `gpui_mc.bin` |
+| **Files** | `<name>.pic` (10,032 bytes — `pic-format.md`); the band's own face is `gpui.bin` / `gpuimc.bin` |
 | **Libraries** | `gfx.lib`, `sprite.lib`, `mouse.lib`, `filesys.lib` |
 | **Footprint** | **71 of the pool's 109 pages** when running (31 code + 27 gfx + 1 sprite + 2 mouse + 10 filesys) |
 | **Source** | `src/tasks/dynamic/grpaint.inc`, wrapped by `grpaint.asm` |
@@ -169,7 +169,7 @@ The pointer is clamped to the canvas, so the sprite cannot be dragged off the ed
 
 ### The band is a file, not code
 
-The palette and the tools are an image: `gpui.bin` for hires, `gpui_mc.bin` for
+The palette and the tools are an image: `gpui.bin` for hires, `gpuimc.bin` for
 multicolour, generated from `assets/ui/gpui.txt` by `tools/gen-ui.py`. Both are resolved
 **once, at startup**, so the MODE tile never has to run a directory scan on a press — a
 scan is a frame long, a frame the pointer is not sampled over, which is a press that never

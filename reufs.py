@@ -575,11 +575,11 @@ def _selftest():
     # name codec: the exact bytes a real image holds
     ok("encode mush", encode_name("musedit.tsk") ==
        bytes([0x0D, 0x15, 0x13, 0x05, 0x04, 0x09, 0x14, 0x2E, 0x14, 0x13, 0x0B]))
-    ok("encode underscore", encode_name("gpui_mc.bin") ==
-       bytes([0x07, 0x10, 0x15, 0x09, 0x5F, 0x0D, 0x03, 0x2E, 0x02, 0x09, 0x0E]))
+    ok("encode underscore", encode_name("a_b.bin") ==
+       bytes([0x01, 0x5F, 0x02, 0x2E, 0x02, 0x09, 0x0E]))
     ok("encode digits", encode_name("llama44.anm") ==
        bytes([0x0C, 0x0C, 0x01, 0x0D, 0x01, 0x34, 0x34, 0x2E, 0x01, 0x0E, 0x0D]))
-    for probe in ("musedit.tsk", "gpui_mc.bin", "llama44.anm", "MUSIC.MUS", "a"):
+    for probe in ("musedit.tsk", "a_b.bin", "llama44.anm", "MUSIC.MUS", "a"):
         raw = encode_name(probe).ljust(NAME_FIELD, b"\x20")
         ok("round trip %s" % probe, decode_name(raw) == probe)
 

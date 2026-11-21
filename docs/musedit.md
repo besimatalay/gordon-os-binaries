@@ -289,6 +289,10 @@ A bar the tune never reaches answers `? no such bar` and leaves the view alone. 
 lands on the row's **own line** — the note line, not one of the command lines above it — with the
 window following, so you arrive where the music is, ready to edit it.
 
+A jump needs no marker in the tune. `MS#` measure markers exist for an editor that could only search
+for a number you had written on the grid (see *Misc*, below); this one counts the bars as it walks, so
+every bar is a destination.
+
 ## Entering notes
 
 The piano at the bottom of the screen is how notes go in.
@@ -1068,8 +1072,10 @@ the sound of a Dalek or a struck bell rather than of a note, and moving the modu
 the whole timbre rather than tuning it.
 
 **The modulator must run, but it must not be heard** — otherwise it doubles the melody in its own
-voice. The format has a command for exactly that: `3-O 1` mutes voice 3's output *without stopping
-its oscillator*, so voice 3 can do the modulating in silence.
+voice. The format has a command for exactly that: `3-O 1` in voice 3's lane sets the chip's
+voice-3-disconnect bit, so voice 3 keeps its oscillator (and so keeps supplying the second frequency)
+while its output stays out of the mix. `3-O 0` puts it back — the demonstrations below use that to let
+voice 3 be heard once the ring-modulated voice is on its way.
 
 Two of them ship with the machine — the Sidplayer demonstration tunes from the Compute's Gazette Sid
 Collection, whose credit is in [`../NOTICE`](../NOTICE) — so you can open them and walk down their
@@ -1296,28 +1302,77 @@ A pulse-width tremolo instead: the width jumps between its written value and tha
 
 | name | operand | what it does |
 |---|---|---|
-| `MS#` | 0-999 | a measure marker: the tune's own numbering of its sections. This player has no display for it, so it is written and kept but has no effect on the sound |
+| `MS#` | 0-999 | a measure marker: the tune's own numbering of its bars, which is a jump target for an editor that searches for it. Nothing in this player reads it, so it is written and kept but has no effect on the sound |
 | `UTV` | 0-255 | **this voice's** utility length, the per-voice twin of `UTL` (see *Tempo*, above) |
-| `FLG` | 0-255 | sets the player's flag byte — **no effect in GordonOS** |
+| `FLG` | 0-255 | the tune's **flag byte**: the player publishes it as `sidFlag`, a fixed byte any task can read, so a program running alongside the music can follow it (change the border, start an animation, switch a screen). See *FLG, the tune's flag* below |
 | `AUX` | 0-255 | the "auxiliary" escape hatch: each player gives it its own meaning, and GordonOS's gives it none — **no effect**. See *Commands that are kept but do nothing here* |
-| `3-O` | 0 or 1 | switches voice 3 off, freeing it for sound effects |
+| `3-O` | 0 or 1 | disconnects **voice 3's output** from the chip's mixer, or reconnects it. Its oscillator keeps running, so voice 3 can modulate voice 1 in silence. `3-O 1` = off |
 | `HLT` | — | stops this voice. Every voice must end on it |
 
 `UTV` sits at the end of the picker rather than beside `UTL`, which surprises people looking for it:
 the two do the same thing, one for all voices and one for the lane it is written in.
 
-`MS#` is a label rather than a control. The original player printed the measure number on its own
-screen; this one has no such display, and nothing reads the value, so a `MS#` is preserved, drawn on
-its own line and otherwise ignored. It is still worth keeping: it is how a tune marks its own
-sections, and the editor's line for it costs no time.
+`MS#` is a label rather than a control. Its job was navigation: you numbered a tune's measures by hand,
+wrote a marker before each one, and the editor could search for a number and move there. Nothing in
+this player reads the value, so a `MS#` is preserved, drawn on its own line and otherwise ignored.
 
-`3-O 1` is the one MISC command that changes what the other lanes sound like: it stops voice 3's own
-notes so a sound effect can have the voice. Every voice ends on its `HLT`, and the editor keeps it —
-it cannot be deleted, only pushed down, because removing it would leave that voice's stream running
-into the next one's bytes.
+Nothing here needs it either. A bar jump counts the bars as the tune walks them, so any bar is a
+destination without a marker, and there is no numbering to keep in step with a bar that was inserted or
+deleted (see *Jumping to a bar*, above). A tune that carries `MS#` markers keeps them, and they cost it
+nothing.
 
-`FLG` and `AUX` are offered, written and kept although this player does nothing with them; see
+`3-O 1` is the one MISC command that changes what another lane sounds like, and it does it in a way
+worth knowing exactly: it sets **bit 7 of the SID's volume/filter register** (`$D418`), which
+**disconnects voice 3 from the audio output** while leaving its oscillator running. It does not stop
+voice 3 and it does not stop the player writing voice 3's registers — the note still plays, it is just
+not mixed in. `3-O 0` puts it back. `VOL` and `F-M` write other bits of that same register and leave
+this one alone, so a later `VOL` does not undo it.
+
+That gives it two uses:
+
+- **A modulator nobody hears.** Voice 1's ring modulation and sync take their second frequency from
+  voice 3, so with `3-O 1` in voice 3's lane, voice 3 supplies the modulator and stays silent. This is
+  what `ringmod` does; *Sync and ring modulation* above has the detail.
+- **Voice 3 for something else.** A tune that uses two voices leaves voice 3 free, and `3-O 1` keeps
+  it quiet while a program — a game's sound effects, say — drives the chip's third voice. That only
+  works once the tune's own voice-3 lane has **stopped** (`HLT`), because until then the player keeps
+  rewriting voice 3's frequency and control registers under whatever the other program wrote.
+
+Every voice ends on its `HLT`, and the editor keeps it — it cannot be deleted, only pushed down,
+because removing it would leave that voice's stream running into the next one's bytes.
+
+`FLG` and `AUX` are the format's two hooks out to the player's host. `FLG` reaches
+one here — see *FLG, the tune's flag* below. `AUX` does not: it jumped to a routine
+the host had installed, and this player's jump lands on a bare `RTS`. It cannot be
+aimed at a task either, because the hook address is a byte in the player's own work
+memory, inside the one shared copy that every task playing a tune uses, so a task
+that wrote it would be steering all of them. `AUX` is still offered, written and
+kept; see
 [Commands that are kept but do nothing here](#commands-that-are-kept-but-do-nothing-here).
+
+### FLG, the tune's flag
+
+`FLG` is the one command that does something outside the music. Its operand is
+written to a fixed byte in kernel memory, and **any task can read it** as `sidFlag`
+— so a program can follow the tune without being the task that is playing it. This
+is the same channel the original player gave the program running alongside it: a
+routine watched the flag and changed the border, ran an animation or printed a line
+of words. Here it would be a game changing its palette at a section, a demo
+switching screens on a chorus, or a drawing task that repaints when the tune says so.
+
+The value is zeroed when a player claims the SID, so every tune starts at 0, and
+nothing resets it when the tune ends — the last value stays readable. Two things to
+keep in mind when writing a tune that uses it:
+
+- **It is a level, not a queue.** Two `FLG`s with no read between them leave only
+  the second, so a reader cannot count them. Use it to say *where in the tune we
+  are*, not *how many times something happened*.
+- **Nothing makes it happen at the exact jiffy you wrote it.** The write lands when
+  the player reaches that line, and the reader sees it at its own next poll, so a
+  flag meant for the downbeat of a bar is best written a line or two early.
+
+A tune that carries `FLG` plays exactly the same with nothing reading it, so a flag
+costs the music nothing.
 
 ### The one command with no line: `JIF`
 
@@ -1490,12 +1545,13 @@ If you know what you want musically, this is the map:
 | repeat a section | `HED` … `TAL` |
 | reuse a passage without copying it | `DEF` … `END`, played by `CALL` |
 | a delayed or gated voice | `UTL` / `UTV` with the utility note lengths |
-| a sound effect on voice 3 | `3-O` frees voice 3 while the tune runs |
+| a silent modulator for `RNG`/`SNC` | `3-O 1` in voice 3 — it mutes voice 3's output and its oscillator keeps running |
+| a sound effect on voice 3 | stop that lane (`HLT`) and `3-O 1`, then drive the chip's third voice from the program |
 
 ### Commands that are kept but do nothing here
 
-Four commands have no effect in the GordonOS player. All four are decoded and preserved in the
-file, and three of them are offered by the picker like any other:
+Three commands have no effect in the GordonOS player. All three are decoded and preserved in the
+file, and two of them are offered by the picker like any other:
 
 - **`JIF`** — "jiffy clock adjust". In the Enhanced player it earned its keep: the tempo table fixes
   which note lengths a tempo can express, and `JIF` rescaled the jiffy so a tempo could carry lengths
@@ -1512,14 +1568,13 @@ file, and three of them are offered by the picker like any other:
   16-31 for the voice's MIDI channel, 32-35 for the channel modes, 48+ for portamento time,
   64+ for velocity and 128-255 for a program (tone) change. GordonOS's player defines none of
   them, so every value is decoded and dropped — but the pair is written and preserved, so a
-  tune made for those players keeps the numbers it was written with.
-- **`FLG`** — sets the player's flag byte. In the original it was how a tune asked the *editor's*
-  screen to print the next line of a `.wds` words file; this player has no screen and no `.wds`
-  support, and nothing reads the flag, so the value is decoded and dropped. It is written like any
-  other command, so a tune that carries one keeps it.
-- **`MS#`** — the tune's own measure number, which the original player printed while the music
-  ran. Nothing in this player reads it, so it is a label: written, kept, and drawn on its own line
-  in the grid, with no effect on the sound.
+  tune made for those players keeps the numbers it was written with. In the original it was also
+  a *call*: the player jumped to a routine the host had installed. Here that jump lands on a bare
+  `RTS`, and the address cannot be aimed at a task — it is a byte in the player's own work memory,
+  inside the one shared copy every task playing a tune uses.
+- **`MS#`** — a measure marker: the tune's own numbering of its bars, which the original editor
+  searched to move about a voice. Nothing in this player reads it, and a bar jump needs no marker, so
+  it is a label: written, kept, and drawn on its own line in the grid, with no effect on the sound.
 
 ### What the format has no room for
 

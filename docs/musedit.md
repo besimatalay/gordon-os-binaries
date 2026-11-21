@@ -765,6 +765,11 @@ are a plain byte work exactly as a signed byte does: **256 + the value**.
 | `DTN` | 0-4095, a 12-bit signed field | **4096 + the value** here: `DTN 256` is 256 sharp, `DTN 3840` is 256 flat, and `DTN 2048` is the -2048 floor |
 | `TPS`, `RTP` | 0-255 | not a sign at all but a packed interval: `TPS 176` is +95, `TPS 15` is -95, `RTP 91` is "no change" |
 
+The rule for a byte is **`256 + the value`**, which makes the negative half of the range the top half:
+-1 is 255, -10 is 246, -128 is 128. `DTN` is twelve bits, so the same idea with 4096 instead of 256;
+and `TPS`/`RTP` are not signed numbers at all but three fields packed into one byte, which *How a
+transpose operand is built* above decodes into an interval.
+
 The byte-wide ones in one line, for the values you are most likely to want:
 
 | value | -128 | -64 | -16 | -10 | -3 | -1 | 0 | +1 | +3 | +10 | +127 |
@@ -1047,7 +1052,7 @@ PNT 12
 
 | name | operand | what it does |
 |---|---|---|
-| `WAV` | 0-7 | which of the SID's waveforms the voice uses: 0 noise, 1 triangle, 2 sawtooth, 3 triangle+sawtooth, 4 pulse, 5 pulse+triangle, 6 pulse+sawtooth, 7 all three |
+| `WAV` | 0-7 | which of the SID's waveforms the voice uses. The value is a **bitmask** — 1 triangle, 2 sawtooth, 4 pulse, added together — except that 0, which no combination can make, stands for noise: so 3 is triangle plus sawtooth, 5 pulse plus triangle, 6 pulse plus sawtooth and 7 all three |
 | `P-W` | 0-4095 | pulse width, a 12-bit value. 2048 is a square wave; towards 0 or 4095 the pulse thins out, and at the ends there is almost nothing to hear |
 | `P-S` | 0-255, as a signed byte | pulse-width **sweep**: added to the width every jiffy, positive widening and negative narrowing, and it keeps going until something changes it |
 | `PVD` | 0-127 | pulse-width vibrato depth |
@@ -1056,11 +1061,14 @@ PNT 12
 | `RNG` | 0 or 1 | ring modulation |
 
 `WAV` is where a voice's character starts: triangle for a flute or bass, sawtooth for strings and
-brass, pulse for anything hollow or reedy, noise for drums and wind. The combinations are the chip's
-own mixtures rather than "two instruments at once" — 5 (triangle plus pulse) is the one that is loud
-enough to use, 6 (sawtooth plus pulse) is a quiet, thin variation, and 3 and 7 are metallic specials.
-The noise waveform is worth more than it looks: it has no pitch of its own, but its *character* changes
-with the note — high notes hiss, low ones rumble — which is what makes a percussion line out of it.
+brass, pulse for anything hollow or reedy, noise for drums and wind. The numbers are the chip's own
+waveform bits, so 1, 2 and 4 are the three tonal shapes and the values between them are the mixtures —
+3 is triangle plus sawtooth, 5 pulse plus triangle, 6 pulse plus sawtooth, 7 all three. The mixtures
+are the chip's own odd sounds rather than "two instruments at once": 5 (triangle plus pulse) is the one
+that is loud enough to use, 6 (sawtooth plus pulse) is a quiet, thin variation, and 3 and 7 are
+metallic specials. The noise waveform is worth more than it looks: it has no pitch of its own, but its
+*character* changes with the note — high notes hiss, low ones rumble — which is what makes a percussion
+line out of it.
 
 `P-W` only means something on a pulse waveform. It is the width of the pulse, so 2048 is an even
 square wave and the further you move from the middle the thinner and more nasal the tone. `P-S` is
@@ -1227,41 +1235,84 @@ a semitone count: `TPS 15` is -95 and `TPS 176` is +95, and `RTP`'s 91 is "no ch
 *Signed operands* above has the details, and the practical way to write an interval in between is to
 copy a line that already transposes the way you want.
 
-There is no fractional transpose. The byte's three low bits are a count of octaves, not a fraction, so
-`TPS` and `RTP` move a voice by whole semitones and no operand gives half of one. Half a semitone is a
-`DTN` instead: 50 cents is about 3% of the note's own frequency word, which is `DTN 130` around middle
-C, `DTN 260` an octave higher and `DTN 65` an octave lower. Because it is a frequency offset rather
-than an interval, the same number is a wider detune the lower the note, so one `DTN` cannot hold a
-fixed quarter tone across a wide range — and the player picks its frequency table by video standard,
-so the size of the interval varies by a few percent between a PAL and an NTSC machine.
+There is no fractional transpose. `TPS` and `RTP` move a voice by whole semitones and no operand gives
+half of one. Half a semitone is a `DTN` instead: 50 cents is about 3% of the note's own frequency word,
+which is `DTN 130` around middle C, `DTN 260` an octave higher and `DTN 65` an octave lower. Because it
+is a frequency offset rather than an interval, the same number is a wider detune the lower the note, so
+one `DTN` cannot hold a fixed quarter tone across a wide range — and the player picks its frequency
+table by video standard, so the size of the interval varies by a few percent between a PAL and an NTSC
+machine.
 
-The intervals you are most likely to want, as operands:
+#### How a transpose operand is built
 
-| semitones up | `TPS` | semitones down | `TPS` |
-|---|---|---|---|
-| 1 | 30 | 1 | 161 |
-| 2 | 46 | 2 | 145 |
-| 3 | 62 | 3 | 129 |
-| 4 | 78 | 4 | 113 |
-| 5 | 94 | 5 | 97 |
-| 6 | 110 | 6 | 81 |
-| 7 | 126 | 7 | 65 |
-| 8 | 142 | 8 | 49 |
-| 9 | 158 | 9 | 33 |
-| 10 | 174 | 10 | 17 |
-| 11 | 190 | 11 | 1 |
-| 12 | 12 | 12 | 179 |
+`TPS` is one byte holding **three fields**, which is why the numbers look arbitrary and are not:
 
-An octave is `TPS 12` up or `TPS 179` down, and each octave further takes two off the up operand and
-adds two to the down one: +24 is `TPS 10` and -24 is `TPS 181`, as far as the ±95 limit (`TPS 176` and
-`TPS 15`). The two rules behind the table are `16n + 14` for n semitones up and `177 - 16n` for n
-down, with `TPS 14` for none — that is the operand to write when a key change ends and the tune goes
-back to its own pitch.
+```
+bit  7 6 5 4 | 3 2 1 | 0
+     semitones  octaves  direction       (0 = up, 1 = down)
+```
 
-`RTP` counts from where the voice already is rather than from the tune's own key, and packs its operand
-differently: `8 x (semitones + 11) + 3`, so three semitones up is `RTP 115` and three down is `RTP 67`.
-`RTP 91` is the odd one: it throws the relative changes away and puts the voice back on the tune's own
-`TPS`.
+- **bit 0** is the direction: 0 transposes up, 1 down.
+- **bits 1-3** are the octaves, and they are written as an index rather than a count: transposing up
+  they are counted **down from seven** (000 means seven octaves, 110 one, 111 none), and transposing
+  down they are counted **up from zero** (000 none, 001 one).
+- **bits 4-7** are the semitones inside the octave: the count itself going up, and **11 minus** the
+  count going down.
+
+So the operand is arithmetic, not a lookup — **each octave is worth 2** in the low nibble:
+
+| the interval you want | the operand |
+|---|---|
+| up, o octaves and s semitones (0-11) | `16 x s + 14 - 2 x o` |
+| down, o octaves and s semitones (1-11, or 0 when o is 1 or more) | `16 x (11 - s) + 2 x o + 1` |
+
+Within one octave the octave field contributes nothing, so the two rules reduce to **`16n + 14` up**
+and **`177 - 16n` down**, and the whole table falls out of them:
+
+| semitones | up: `16n + 14` | down: `177 - 16n` |
+|---|---|---|
+| 1 | 30 | 161 |
+| 2 | 46 | 145 |
+| 3 | 62 | 129 |
+| 4 | 78 | 113 |
+| 5 | 94 | 97 |
+| 6 | 110 | 81 |
+| 7 | 126 | 65 |
+| 8 | 142 | 49 |
+| 9 | 158 | 33 |
+| 10 | 174 | 17 |
+| 11 | 190 | 1 |
+
+The octave field is what takes it past an octave, and it is the only reason `TPS 12` (one octave up)
+is a *smaller* number than `TPS 190` (eleven semitones up):
+
+| interval | operand | built as |
+|---|---|---|
+| none | 14 | 0 octaves, 0 semitones — what a key change ends on |
+| +12 | 12 | 1 octave up, 0 semitones: `0 + 14 - 2` |
+| -12 | 179 | 1 octave down, 0 semitones: `16 x 11 + 2 + 1` |
+| +13 | 28 | 1 octave and 1 semitone up: `16 + 14 - 2` |
+| -13 | 163 | 1 octave and 1 semitone down: `16 x 10 + 2 + 1` |
+| +24 | 10 | 2 octaves up: `0 + 14 - 4` |
+| -24 | 181 | 2 octaves down: `16 x 11 + 4 + 1` |
+| +95 | 176 | the limit: 7 octaves and 11 semitones |
+| -95 | 15 | the limit the other way |
+
+A transpose cannot extend the SID's range: past B7 the notes clamp to octave 7, so a `TPS` that
+overshoots plays the same pitch an octave lower than you asked for. Negative transposes can reach into
+octave -1, which is rarely useful but is legal.
+
+⚠️ **`TPS 0` is not "no transpose".** It is seven octaves up — bits 1-3 are `000`, and up they count
+down from seven. The value that means *no change* is **`TPS 14`**. Values outside the ranges in the
+table are not intervals at all but accidents of the fields: `TPS 177` is "minus zero semitones" and
+plays as no transpose, the same as 14, and anything past ±95 wraps into one of those duplicates
+instead of reaching further.
+
+`RTP` counts from where the voice already is rather than from the tune's own key, and packs its byte
+the same way round but with different offsets: **`8 x (semitones + 11) + (octaves + 3)`**, where
+`octaves` is a signed -3 to +4. Three semitones up is `8 x 14 + 3` = `RTP 115` and three down is
+`8 x 8 + 3` = `RTP 67`. That formula makes `RTP 91` (0 semitones, 0 octaves) "change nothing", and the
+player reads exactly that as *throw the relative changes away and go back to the tune's own `TPS`*.
 
 ```
 VDP 8
@@ -1335,6 +1386,16 @@ aimed at all three voices independently — which is why it takes several comman
 | `MAX` | 0-255 | the top of the range: the ceiling the climb turns round at, and the level a pulse sits at when it is high. **0 switches the effect off** |
 | `SRC` | 0-2 | what a voice reads: 0 the software oscillator above, 1 the chip's own oscillator 3 output, 2 its envelope 3 output. Nothing above 2 is a source — the player reads a three-byte table and walks off its end |
 | `SCA` | 0-7 up, 249-255 down | how much of that reading the voice takes, as a shift: each step up doubles it, each step down halves it, 3 is eight times and 253 an eighth |
+
+`SCA` is a signed byte like the sweeps, so the down half of the range is `256 + the value`: 255 is -1
+and halves the reading, 254 is -2 and quarters it, and so on. The steps are powers of two and therefore
+not evenly spaced in effect, which is why the table is worth having:
+
+| operand | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|---|
+| multiplies the reading by | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
+| operand, going down | — | 255 | 254 | 253 | 252 | 251 | 250 | 249 |
+| divides the reading by | — | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | `DST` | 0-3 | where the voice adds it: 0 nowhere, 1 to its frequency, 2 to its pulse width, 3 to the filter cutoff |
 
 **The two shapes work differently, and that is the thing to know.** With `LFO 0` the value walks: it
@@ -1886,8 +1947,9 @@ Three notes on the numbers:
 - **The signed fields are the value you type**, so `AUT 246` is -10, `AUT 236` is -20 and `AUT 216` is
   -40; the *Signed operands, and how they are written* section above has the rest of the pattern.
 - **`TPS` is the packed interval**, not a semitone count: `TPS 14` is no transpose, `TPS 12` is an octave
-  up, `TPS 179` is an octave down and `TPS 126` is seven semitones up; the *Frequency* section above has
-  the table for every interval. `DTN` beside it is a plain number.
+  up, `TPS 179` is an octave down and `TPS 126` is seven semitones up; *How a transpose operand is built*
+  above shows how each of those is assembled from the three fields in the byte. `DTN` beside it is a
+  plain number.
 
 ### Envelope and waveform
 

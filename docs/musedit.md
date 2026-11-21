@@ -39,6 +39,7 @@ C64 could not. (`sidplay` is the simple case: it loads the one tune it is given 
 - [Playing](#playing)
 - [Commands: envelopes, waveforms, vibrato, filter and the rest](#commands-envelopes-waveforms-vibrato-filter-and-the-rest)
 - [A few habits that make a tune sound better](#a-few-habits-that-make-a-tune-sound-better)
+- [Advanced techniques](#advanced-techniques)
 - [Undo and redo](#undo-and-redo)
 - [Saving, quitting, and what is left behind](#saving-quitting-and-what-is-left-behind)
 - [When musedit says no](#when-musedit-says-no)
@@ -376,6 +377,10 @@ written into an empty row, where the length may be laid down as two tied pairs o
 shows it as `TIE` after the duration, which is also how a tied event already in a tune reads — a
 dotted, tied note reads `C-4 8. TIE` and is the duration byte's bits 6 and 5 together. A rest never
 carries a tie, and entering a rest clears the bit from a note that had one.
+
+When you tie notes of **different** lengths, put the shorter one first. A tied note does not release,
+so the release can only begin at the last note of the chain — and with a larger `PNT` the release
+would otherwise have started inside the long note and been pushed later than the music wants.
 
 ### Utility lengths
 
@@ -719,6 +724,12 @@ next row the tempo is the **last** of them (voice 3's, since the player processe
 order). Rows that become illegal because of a tempo change are flagged on the grid rather than
 silently kept.
 
+Put a tempo change where all three lanes **start** a note. Each voice's note length is worked out when
+its note begins, so a change that lands in the middle of a held note leaves that lane finishing its
+note at the old tempo while a lane that changed on time has already moved — the three drift apart by
+the difference, and they stay apart. A change on a row where every lane begins a note keeps them
+together.
+
 ### Reading a command
 
 A command line is a mnemonic and a number, both in decimal: `TEM 160`, `P-W 2048`, `F-C 40`. The
@@ -925,10 +936,13 @@ length. What keeps them together is that a lane's whole section lasts the same n
 the others — a lane whose section is shorter comes round early. And a `HED` with no `TAL` after
 it never loops at all: on its own it is only a marker.
 
-Two things to know before you type one:
+Two things are worth knowing before you type one:
 
 - **`HED 0` never ends.** The pass plays forever; you stop it with `SPACE` and you cannot reach
   anything after the `TAL`, because the music never gets there.
+- **Loops cannot be nested.** The player remembers one head per voice, so a `HED` inside an open
+  section overwrites the outer one and the outer loop comes round to the wrong place. Two sections
+  in one lane are fine as long as they meet end to end; one inside the other is not.
 - **The count is total plays, including the first.** To write "play this section twice", the operand
   is 2. A `TAL` has to close a `HED` in the same body: put the two in different phrases and the
   section is not a section at any call site, which is why the editor refuses it with
@@ -953,6 +967,12 @@ A phrase is the format's only compression, and it is a good one: the body is wri
 `CALL` costs 2 bytes, so a four-bar riff that comes round six times is written once. Twenty-four
 phrases fit in the command byte, and any voice may call any of them — a body is global, not per
 voice.
+
+Because a phrase exists as soon as the player has walked past its `DEF`, a second voice can call it
+**the same row** the first voice defines it: one lane carries the notes and the others join in by
+calling the same body, with their own `DTN`, `TPS`, `WAV` or `VOL` in front of the `CALL`. That is the
+cheapest way to get two voices playing exactly the same line — the recipe the chorus effect below is
+built on — and it keeps them identical by construction rather than by hand-copying.
 
 The subtlety is that **the definition is also a play site**. `DEF` does not mean "store this for
 later"; the player walks into the body, plays it, and comes out at the `END`. So a tune's first
@@ -995,12 +1015,25 @@ raise `PNT` towards the note's length for a softer, more legato line, and lower 
 `HLD` is the opposite guard, for staccato: it holds the note at full gate for its first `HLD` jiffies,
 so a very short note is not released before it has been heard.
 
+⚠️ **`PNT` has to be shorter than the shortest note in the lane.** The release point is a count back
+from the end of every note, so a note shorter than `PNT` is released the instant it starts: it either
+never speaks or gives a click. When one lane mixes long notes and short ones, either keep `PNT` below
+the shortest of them, or set `HLD` to cover the short notes' opening jiffies — that is what `HLD` is
+for.
+
+**A note and a rest of equal length are one longer note.** In a lane that alternates, say, quarter
+notes and quarter rests in a bass line, write the pair as a single note of the combined length and put
+the release where the rest used to begin: `PNT` = the rest's length plus the release you wanted. A
+36-jiffy note, a 36-jiffy rest and `PNT 4` become one 72-jiffy note with `PNT 40`. The lane then
+carries half the rows, and the sound is the same.
+
 Three habits are worth keeping. `PNT 0` never releases a note at all, which
 is the cheapest legato there is — a run of notes with `PNT 0` sounds as one continuous line without a
 tie on every event. `ATK 0` is worth avoiding when all three voices start notes together, because the
 chip can then fail to gate them at once and one voice will speak first; `ATK 1` costs nothing. And a
 release of 0 sometimes cuts voices off unevenly, so 1 to 15 is safer. `SUS` is the only per-voice
-volume there is, so a harmony voice one level below the melody is what lets the melody sit on top.
+volume there is, so a harmony voice one level below the melody is what lets the melody sit on top,
+and a slow `DCY` softens the drop from the attack's peak to that sustain level.
 
 ```
 ATK 1
@@ -1023,8 +1056,11 @@ PNT 12
 | `RNG` | 0 or 1 | ring modulation |
 
 `WAV` is where a voice's character starts: triangle for a flute or bass, sawtooth for strings and
-brass, pulse for anything hollow or reedy, noise for drums and wind. The combinations (3, 5, 6, 7) are
-the SID's own, and they are odd, metallic sounds rather than "two instruments at once".
+brass, pulse for anything hollow or reedy, noise for drums and wind. The combinations are the chip's
+own mixtures rather than "two instruments at once" — 5 (triangle plus pulse) is the one that is loud
+enough to use, 6 (sawtooth plus pulse) is a quiet, thin variation, and 3 and 7 are metallic specials.
+The noise waveform is worth more than it looks: it has no pitch of its own, but its *character* changes
+with the note — high notes hiss, low ones rumble — which is what makes a percussion line out of it.
 
 `P-W` only means something on a pulse waveform. It is the width of the pulse, so 2048 is an even
 square wave and the further you move from the middle the thinner and more nasal the tone. `P-S` is
@@ -1034,10 +1070,26 @@ the fast shimmer of a dance lead. `PVD`/`PVR` are the gentler version of the sam
 thing — depth and rate of a vibrato applied to the *width* rather than the pitch, which is what makes
 a held lead sound alive without going out of tune.
 
+**A combined waveform is quieter, and on 5 the width sets the volume.** `WAV 5` (triangle plus pulse)
+is the one combination loud enough to be worth using: at the top of the range it sounds like a pulse
+wave, and it takes on body as the note falls. On that waveform the pulse width acts as a **volume
+control** — lower is louder — and it must stay below 2048 to be heard at all, which means a `P-W`
+sweep on `WAV 5` fades the tone away instead of sweeping its timbre. `WAV 6` (sawtooth plus pulse) is
+much quieter; it is occasionally useful for a thin, reedy line, again with a low width. `WAV 3` and
+`WAV 7` are the chip's own odd mixtures and are not two instruments at once.
+
 Three practical notes on the pulse. Some chips play it noticeably out of tune in the bottom octaves,
 so keep it out of octaves 0 and 1. A width much below about 100 (or above about 4000) is near silence
-on some chips, so stay nearer the middle. And a big `P-S` rate can carry the width past 4095, where it
-wraps — the wrap is an audible pop, so either slow the sweep or split the note.
+on some chips, so stay nearer the middle — a width under 100 with no sweep running is inaudible on
+most machines. And a big `P-S` rate can carry the width past 4095, where it wraps — the wrap is an
+audible pop, so either slow the sweep or split the note. A `PVD`/`PVR` pair with a slow rate is the
+neat fix for the second problem: the pulse width still moves, but it turns round before it can wrap.
+
+**Put a `WAV` change before a note, not before a rest.** A rest is silence the player writes, not
+silence the chip makes, so a note released into a rest is still fading while the rest is under way. A
+`WAV` command sitting immediately before that rest changes the waveform under the fading tail and cuts
+it audibly short. The same command placed before the *next* note does the same job and lets the
+release finish.
 
 ```
 WAV 4
@@ -1058,24 +1110,51 @@ fixed by the chip and by nothing in the tune:
 
 So either effect costs a **pair** of voices out of the three, and the pair has to be playing at the
 same time: one voice carries the sound you hear, the other is the modulator. That is why they turn up
-on a lead over a bass line, or in a two-voice tune, and rarely anywhere else.
+on a lead over a bass line, or in a two-voice tune, and rarely anywhere else. In practice the pair is
+**voice 1 and voice 3** — the modulator sits in the lane you can most easily spare, and `3-O 1` in
+that lane is what keeps it out of the mix.
 
 **`SNC 1` — oscillator sync.** Every time the other oscillator finishes a cycle, the sounding
 voice's oscillator is forced back to the start of its own. The ear hears the sounding voice locked to
 the modulator's rate, which turns a smooth waveform into a hard, reedy, metallic tone; the classic
 sync lead is made by *sweeping the modulator's pitch* under a held note, which drags the timbre with
-it. Raising the sounding voice's own pitch as well moves it up in steps rather than smoothly.
+it. Raising the sounding voice's own pitch as well moves it up in steps rather than smoothly. Two
+voices an octave apart sync by themselves, which is why an octave or two of `TPS` gives a rich, warm
+doubling and a third or a sixth gives a sour one — with `SNC 1` that sour interval becomes the
+metallic timbre instead.
 
 **`RNG 1` — ring modulation.** The two oscillators are multiplied together instead, which replaces
 the tone with the sum and difference of their frequencies: inharmonic, bell-like, clangorous. It is
 the sound of a Dalek or a struck bell rather than of a note, and moving the modulator's pitch moves
-the whole timbre rather than tuning it.
+the whole timbre rather than tuning it. Three things follow from that, and they are what make the
+effect work:
+
+- **The sounding voice wants a triangle.** Ring modulation only sounds clean when the voice carrying
+  it is on `WAV 1`, and a non-sustaining envelope (`SUS 0`, a short `DCY`) suits the percussion and
+  bell sounds it is used for.
+- **Its pitch can come out flat, and the fix is to transpose both voices.** Transposing only the
+  modulator moves the timbre *and* detunes the result by a few semitones; transposing both by the
+  same amount keeps the timbre and puts the pitch back. Only some intervals give a usable sound, and
+  they are found by ear rather than by rule — try a fourth, a fifth, an octave, an octave and a
+  fourth, then the intervals above two octaves. The ones that come out thin or squeaky are exactly
+  the ones the low-pass filter cleans up.
+- **The same interval sounds different in a different octave.** Transposing the pair up an octave
+  keeps the ring-modulation interval and changes the tone, which is a cheap second sound from the
+  same notes.
 
 **The modulator must run, but it must not be heard** — otherwise it doubles the melody in its own
 voice. The format has a command for exactly that: `3-O 1` in voice 3's lane sets the chip's
 voice-3-disconnect bit, so voice 3 keeps its oscillator (and so keeps supplying the second frequency)
 while its output stays out of the mix. `3-O 0` puts it back — the demonstrations below use that to let
-voice 3 be heard once the ring-modulated voice is on its way.
+voice 3 be heard once the ring-modulated voice is on its way, and giving voice 3 the same waveform and
+envelope as voice 1 instead of muting it makes the same tone noticeably fuller-bodied.
+
+**Both switches together** is a third sound rather than a doubled effect: set voice 1 to `WAV 1` with
+`RNG 1` and `SNC 1`, set a `TPS` interval, and let voice 3 call the same phrase behind `3-O 1`. The
+triangle is still required, any interval is usable (the two effects keep the result in tune), and the
+timbre changes with every interval you try. A ring-modulated tone that comes out thin or squeaky can
+also be passed through the low-pass filter, which removes the extra high tone that some intervals
+produce.
 
 Two of them ship with the machine — the Sidplayer demonstration tunes from the Compute's Gazette Sid
 Collection, whose credit is in [`../NOTICE`](../NOTICE) — so you can open them and walk down their
@@ -1108,6 +1187,12 @@ runs, and a little of both on a held lead is usually all a tune needs. Depth is 
 frequency units rather than in semitones, so the same depth is a wider interval low down than high
 up — turn it down when you move the tune up an octave.
 
+⚠️ **Vibrato only runs while a note is sounding.** A rest is silence the player writes, so a note that
+is released into a rest loses its vibrato part-way through its fade — audible as the wobble stopping
+dead while the sound is still going. The cure is the release point: delete the rest, add its length to
+the note, and raise `PNT` by the same amount, so the note fades *through* what used to be the rest
+with the vibrato still running.
+
 `POR` is how a slide is written: with it in force, a new note does not jump to its pitch, and the
 voice moves from the note it was playing towards the new one by `POR` frequency units every jiffy
 until it arrives. A small operand is a slow bend, a large one a swoop, and `P&V 1` keeps the vibrato
@@ -1116,9 +1201,22 @@ value.
 
 `DTN` shifts the whole voice, so two voices playing the same line with opposite small detunes give
 the classic chorus: `DTN 256` on one and `DTN 3840` (which is -256) on the other thickens a single
-line into two. `TPS` transposes everything after it, which is how a tune changes key for a last
-chorus; `RTP` works from the note before it instead, so the same value follows the melody rather
-than the tune's own key.
+line into two. Small values are the ones to start with — around **50** is a gentle chorus near middle
+C, and a value large enough to reach a quarter tone is a different, far more sour effect. `TPS`
+transposes everything after it, which is how a tune changes key for a last chorus; `RTP` works from the
+note before it instead, so the same value follows the melody rather than the tune's own key.
+
+Because a frequency offset is what it is, `DTN` also reaches **pitches the keyboard has no key for**:
+take the nearest note and add the difference. A voice's frequency word is its frequency in hertz
+divided by the machine's clock over 2^24 — about 0.061 on an NTSC machine and 0.059 on a PAL one — so
+on NTSC a target of 500 Hz is a word of 8201, B4's word is 8101, and `DTN 100` before B4 plays 500 Hz.
+The player's own table is the authority for the note you start from, and it is chosen by video
+standard; only the *sign* of the operand matters for direction, so the same value flat is `DTN 3996`
+(4096 - 100). It is the same lever as the quarter tone above, used deliberately.
+
+A **`TPS` of ±12 is how a written 8va is played**: enter the notes as written and put the octave
+offset at the start of the passage rather than hunting for the leger lines. Two voices on the same
+notes, one of them an octave or two up, is the rich doubling the sync section above is built on.
 
 A transpose cannot extend the SID's range: past B7 the notes clamp to octave 7, so a `TPS` that
 overshoots plays the same pitch an octave lower than you asked for. Negative transposes can reach
@@ -1187,17 +1285,32 @@ The filter is the part of the SID that varies most between machines — the same
 sound beautifully on one chip barely moves on another — so it is worth hearing a filtered sound on
 more than one machine before leaning on it.
 
+⚠️ **Only one voice should be filtered at a time.** There is one filter for the whole chip, and two or
+three voices through it at once can drive it into an unpleasant buzz rather than a stronger effect. A
+`FLT 1` in one lane and `FLT 0` in the others is the normal arrangement; the exception is a passage
+where the extra buzz *is* the sound.
+
 The filter is one block for the whole chip: `F-M`, `F-C`, `RES` and `F-X` are chip-wide, while `FLT`
 decides which voices are fed into it. That is why a filtered bass and an unfiltered lead can coexist —
 the bass lane carries `FLT 1` and the lead lane `FLT 0` — but they share one cutoff.
 
 `F-S` is the classic filter sweep, drifting the cutoff by that much every jiffy until something
-changes it: `F-S 3` opens, `F-S 253` closes, and the bigger the number the faster it travels. `AUT`
-is key-follow: it sets the cutoff from the note's own pitch, so high notes come out brighter than low
-ones, and the operand offsets that whole curve — `AUT 20` a little brighter everywhere, `AUT 236`
-(which is -20) a little darker. It is what keeps a bass line from disappearing behind a lead.
-Resonance is the character of the sweep, and a lot of it is loud — drop `VOL` when you raise
-`RES`.
+changes it: `F-S 3` opens, `F-S 253` closes, and the bigger the number the faster it travels. Values
+much past 10 either run away or wrap the cutoff round the top of its range, which sounds like a click
+rather than a sweep. `AUT` is key-follow: it sets the cutoff from the note's own pitch, so high notes
+come out brighter than low ones, and the operand offsets that whole curve — `AUT 20` a little brighter
+everywhere, `AUT 236` (which is -20) a little darker. It is what keeps a bass line from disappearing
+behind a lead. Resonance is the character of the sweep, and a lot of it is loud — drop `VOL` when you
+raise `RES`.
+
+When a voice stops being filtered, stop the sweep with it: `FLT 0` plus `F-S 0` (and `AUT 0` if
+key-follow was in use). A sweep left running belongs to the whole chip, so it carries on dragging the
+cutoff under whatever is filtered next.
+
+`F-X` — the external audio input — is worth one line of its own because of a quirk: with the input
+connected the chip picks up less of the machine's own electrical noise, so **this player starts with
+`F-X` on**, and that is the cleaner default the original's manual recommends. A tune that turns it off
+gets the harsher tone back, which is occasionally what a particular effect wants.
 
 ```
 F-M 1
@@ -1269,8 +1382,20 @@ accent and none of them re-wires the oscillator. `MAX 0` is how a tune of this k
 off for a note — the archive's `Dream_on` alternates `MAX 136` and `MAX 0` throughout. Setting `MAX`
 is the cheap way to perform it: one command per note.
 
-Note also that this voice modulates *itself*. The software oscillator is per-voice, so a voice that
-uses it needs no partner — unlike `SNC` and `RNG` below, which each consume two voices.
+Note also that this voice modulates *itself* in the sense that it needs no **partner** voice — unlike
+`SNC` and `RNG` below, which each consume two voices. The oscillator is not per voice, though: the
+player runs **one** of them for the whole tune and advances it once per jiffy, so every voice reading
+`SRC 0` reads the same number. What each voice keeps for itself is how much of it to take (`SCA`) and
+where to put it (`DST`); the shape, the rates and the ceiling (`LFO`, `RUP`, `RDN`, `MAX`) are one set
+for the tune. Two voices on `SRC 0` therefore move together, and changing `MAX` for one changes it for
+both.
+
+**Choose the scale with the destination in mind.** `SCA` only doubles and halves, so a workable range
+is usually found by picking the shift first and using `MAX` to trim it: each step up is a **doubling**
+— `SCA 1` is twice, `SCA 2` four times, `SCA 3` eight times — and 6 or 7 make the number so large that
+a frequency wobble becomes a siren. As a rough guide, frequency modulation stays musical at 3 or below,
+the pulse width above 3 gets extreme, and the cutoff rarely wants more than 2. And because there is one
+filter, only one voice should have `DST 3` at a time.
 
 Two worked settings:
 
@@ -1310,7 +1435,12 @@ A pulse-width tremolo instead: the width jumps between its written value and tha
 | `HLT` | — | stops this voice. Every voice must end on it |
 
 `UTV` sits at the end of the picker rather than beside `UTL`, which surprises people looking for it:
-the two do the same thing, one for all voices and one for the lane it is written in.
+the two do the same thing, one for all voices and one for the lane it is written in. A voice therefore
+has **two** utility lengths available at once, `UTL`'s and its own, and a note written with the
+utility length takes whichever one the lane last set. One consequence catches people out: when a lane
+calls a phrase defined in another lane, the utility-length notes inside it play at the **calling**
+lane's `UTV`, not the defining lane's — so a phrase meant to work from any voice should carry its own
+`UTV` at the top of the body.
 
 `MS#` is a label rather than a control. Its job was navigation: you numbered a tune's measures by hand,
 wrote a marker before each one, and the editor could search for a number and move there. Nothing in
@@ -1410,6 +1540,92 @@ it is worth ten minutes before you start writing something long.
 - **Bass lines vanish on a television.** The lowest octaves are mostly felt rather than heard on a
   small speaker, so check a mix on something better than the monitor before deciding a bass part is
   too quiet.
+
+## Advanced techniques
+
+Everything above is one command at a time. These are the things the commands are combined into: each
+recipe is a handful of lines in a lane, and none of them needs a command this guide has not already
+described.
+
+### Percussion from the noise waveform
+
+`WAV 0` has no pitch, but its character follows the note: high notes hiss like a hi-hat, low ones
+rumble like a drum. A percussion line is therefore a noise voice playing **short** notes at chosen
+pitches, with an envelope that does not sustain — the pitch is the timbre, so the line never clashes
+with the melody's key. Repeat the phrase every bar or two and it becomes a rhythm rather than a
+random effect.
+
+The filter is what turns one noise into several. The same noise through a high-pass is a snare-like
+click, unfiltered it is a shaker, and moving `F-C` under it turns a hit into a sweep.
+
+```
+WAV 0
+ATK 0
+DCY 6
+SUS 0
+REL 4
+PNT 1
+F-M 4
+FLT 1
+```
+
+### A drum and a bass line on one voice
+
+The two parts do different jobs, but they need not occupy different voices. Write the drum as a
+**phrase** whose body sets the noise envelope and waveform, plays one note, and then sets the bass
+envelope and waveform back; the bass lane then plays its notes with a `CALL` to that phrase between
+them. Every call plays the body inline, so the drum lands exactly where the call sits.
+
+### An echo
+
+Two voices play the same notes (the phrase trick above gets them identical), one of them detuned
+slightly so the copies are distinguishable, and the second lane starts with a **very short rest** —
+a utility length of a jiffy or two. The result reads as an echo rather than a canon: the same sound
+again, just late enough to be heard as a repeat. A longer delay turns the effect into a round, which
+is a different thing entirely.
+
+### Two voices for one long line
+
+A voice can only start a note when the previous one has ended, and the release of the first note is
+what makes a fast line sound clipped. Split the line **between two voices**: voice 1 takes the first
+note, voice 2 the second, voice 1 the third, and so on. Each new note starts while the previous one is
+still fading, so the line sounds continuous even with a short release. It also halves the work each
+lane does, which leaves room for a wider range without the notes running into one another.
+
+In `musedit` the split is done by hand: copy the lane's events into an empty voice, then turn every
+second event into a rest of the same length in one voice and the opposite events into rests in the
+other. Keep the two envelopes identical, or the alternation will be audible as a change of tone
+rather than as one instrument.
+
+### A vibrato that deepens
+
+Vibrato depth is a command, so it can change during a note. Break a long note into four tied notes of
+equal length, put an increasing `VDP` before the second, third and fourth (the note is still one
+sound, because the ties keep the gate open), and leave the last one untied. The wobble grows into the
+note instead of starting at full depth, which is what a singer does. Reset `VDP` before the next note.
+
+### A glide longer than any note
+
+`POR` slides by its operand every jiffy, so a long slide needs time as well as a small step. When no
+note length in the tempo is long enough, use a **utility-length** note: `UTL`/`UTV` go up to 255
+jiffies, well past the longest duration a tempo offers, so the slide can take as long as it needs.
+
+### A voice that is quieter without `VOL`
+
+`VOL` is the whole chip's volume, so it cannot make one voice quieter. Two things can: `SUS` — a
+harmony voice one or two levels below the melody sits behind it instead of competing — and a slower
+`DCY`, which softens the drop from the attack's peak so the note is less biting without being quieter
+at all. A third lever is the attack itself: with a slow `ATK` and a `HLD`/`PNT` pair that drops the
+gate before the attack reaches its peak, the note never gets loud, which is the soft, breathy attack
+flutes and strings want.
+
+### Fitting four parts into three voices
+
+Most keyboard music has more parts than the chip has voices, and something has to go. In order of how
+little it is missed: a bass note that is also played an octave or two up in the treble (drop the
+treble copy), an inner harmony note (keep the top and the bottom of a chord and drop the middle), and
+anything in the accompaniment that the melody already implies. A melody plus a bass line leaves a
+whole voice for harmony or percussion, which is usually worth more than a fuller chord.
 
 ## Undo and redo
 
@@ -1850,10 +2066,25 @@ F-S 5
 ## Where some of this comes from
 
 `musedit` writes the command format of a C64 music player from the mid-1980s, and part of what this
-guide says about it is drawn from the book that documents that player — *All About the Commodore 64,
-Volume Two* by Craig Chamberlain (COMPUTE! Publications, 1985). The instrument recipes in the appendix,
-what a tune starts out with, the dynamics-to-`VOL` table and the utility-length arithmetic all come
-from there.
+guide says about it is drawn from the two books that document that player, both by Craig Chamberlain
+and published by COMPUTE! Publications:
 
-Everything about names, controls and behaviour is this system's own, and where the book and our player
-differ the guide follows the player.
+- ***All About the Commodore 64, Volume Two*** (1985) — the player and its editor. The instrument
+  recipes in the appendix, what a tune starts out with, the dynamics-to-`VOL` table and the
+  utility-length arithmetic come from here.
+- ***COMPUTE!'s Music System for the Commodore 128 & 64: The Enhanced Sidplayer*** (1986) — the same
+  player extended. The chapter on waveforms is where the pulse-width-as-volume behaviour of the
+  combined waveforms and the percussion use of the noise waveform come from; the envelopes chapter
+  gave the release-point rules (the note-and-rest merge, `HLD` as the guard for short notes); the
+  frequency chapter the detune-as-chorus and transposition-for-ring-modulation advice; the
+  modulation chapter the meanings of `SRC`, `DST`, `SCA`, `MAX` and the two `LFO` shapes; and the
+  hints chapter most of the practical habits — one filtered voice at a time, the tempo change where
+  the lanes start notes, no nested repeats, the shorter note first in a tie.
+
+Everything about names, controls and behaviour is this system's own, and where a book and our player
+differ the guide follows the player. Two of those books' commands are worth naming here because the
+guide treats them differently: `JIF` (which retunes the jiffy so any duration can be played at any
+tempo) has nothing to grip in GordonOS, where the jiffy is the scheduler's tick; and the
+absolute-set-pitch command, the one that makes the books' pitch-bend and pitch-while-fading effects
+possible, is not in this format at all — nothing here sets a voice's pitch without a note to hang it
+on.

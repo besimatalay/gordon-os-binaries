@@ -463,7 +463,10 @@ non-zero value sets (the pixel then shows `pen1`'s colour); in multicolor
   editor).
 - `scroll top,bottom` — set the scroll region (inclusive rows) and move
   the cursor to its top-left corner.
-- `scrollby n` — scroll the current region by `n` rows.
+- `scrollby n` — scroll the current region by `n` rows: a positive `n` scrolls
+  **up** (content moves towards the top, the bottom row is blanked), a negative
+  `n` scrolls **down** (content moves towards the bottom, the top row is
+  blanked), and `0` does nothing. `scrollby -1` is the reverse of `scrollby 1`.
 
 ### Example
 

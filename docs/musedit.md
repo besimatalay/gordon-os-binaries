@@ -636,8 +636,8 @@ splitting it.
 
 ### Writing a command line
 
-Put the cursor on a **note's own row** and press `C` (or click `CMD` on the control bar). The head
-row becomes the prompt:
+Put the cursor on a **note's own row** — or on the row the voice's `HLT` sits on — and press `C`
+(or click `CMD` on the control bar). The head row becomes the prompt:
 
 ![the command prompt on an existing TEM line](img/musedit-cmd.png)
 
@@ -690,10 +690,20 @@ first ends up furthest from the note and the last nearest. What the lines *show*
 rather than by order: the row's sound commands sit on the lines further above the note and the
 structural nine on the lines nearest it.
 
-A row only has a boundary if an event *starts* there, so a row in the middle of a longer note cannot
-take a command — the format has no way to split the note, and the editor answers `? no event here`
+A row has a boundary if an event *starts* there, or if it is the row that voice's `HLT` sits on —
+the end of the voice's last event. A row in the middle of a longer note has neither, so it cannot
+take a command: the format has no way to split the note, and the editor answers `? no event here`
 rather than writing a pair that would fire at the wrong moment. Put the command on the row the note
 starts on instead; a command there applies from that note's onset.
+
+**The end boundary is the one a new tune has.** Every voice of a fresh tune is a bare `HLT`, so
+`C` works from the first keystroke and the pair lands immediately above that `HLT` — there is
+nothing to enter first. The same boundary is where a **section closes**: a lane whose repeat ends
+with the music carries its `TAL` (or `END`) immediately before its `HLT`, and pressing `C` on the
+`HLT` line itself is how you write one. A pair written there is edited and removed like any other
+(`C` on its line opens it, `SHIFT`+`INST/DEL` removes it); the `HLT` itself cannot be removed,
+because a voice without one cannot be read again, and a *sound* command written there is legal but
+pointless — the voice halts the instant it takes effect.
 
 **Editing and removing** — put the cursor on an existing command line and `C` opens the prompt *on
 that line*, already filled in and ready to change; `SHIFT`+`INST/DEL` removes that pair and closes
@@ -1775,7 +1785,7 @@ Every message the editor can print, and what to do about it:
 | `? illegal duration` | the current tempo cannot express that note length |
 | `? illegal tempo` | a command write left a length the tempo cannot express; the editor **took the pair straight back** — the tune is exactly as it was, with nothing to undo |
 | `? the tune cannot play that` | a written command left the tune unwalkable in some other way — a `CALL` to a phrase with no `DEF`, a call stack one frame too deep, a `TAL` whose `HED` is in another phrase. The pair was taken straight back |
-| `? no event here` | the rest or delete key needs the cursor on a row where an event starts |
+| `? no event here` | the rest or delete key needs the cursor on a row where an event starts, and a command write needs a boundary — an event's own row, or the row the voice's `HLT` sits on. A row inside a longer note has neither |
 | `? a note in voice 2 spans the row` | `R` or `SHIFT`+`R` met a note that runs past that row, so the row cannot be closed without shortening it — shorten the note first, then delete |
 | `? hlt ends the voice` | `SHIFT`+`INST/DEL` on an `HLT` line: that pair is what ends the voice, so removing it would leave the voice unreadable — delete the events above it instead, or retype the line |
 | `? phrase 3 x5` | an insert or a delete was attempted on a row inside phrase 3's `DEF` body, which 5 `CALL` sites play — move off it, or edit the phrase deliberately with a note |

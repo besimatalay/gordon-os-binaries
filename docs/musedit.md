@@ -222,27 +222,68 @@ length prints no number, because its length is whatever `UTL`/`UTV` set.
 A dot or a triplet is a **mark right after that number** — the same three marks the control bar's
 dot cell uses: `.` dotted, `:` double-dotted, `*` triplet. Nothing is printed for a plain note, so
 `8` is an eighth and `8.` is a dotted eighth: two different lengths, so read them as two different
-things. All three come from the duration byte itself (bit 5 the dot, bit 7 the triplet, or the
-second dot with bit 5), which means the mark is the format's own information and not a note the
-editor keeps on the side. A note whose onset did not land on a row takes no mark: its lane ends in
-the `?` instead, which is the more important thing about it.
+things. The mark is part of the length the note itself stores, which means it is the format's own
+information and not something the editor keeps on the side.
 
-**The 64th is the one length that always wears its dot.** Its class bits are zero, so a plain
-`$00` byte is the one value the player never reads as a length — it skips that event before it
-looks at the class. The dot bit is what makes the byte non-zero, and the player ignores the dot for
-a 64th: it grants the tempo's own short length, which is exactly what a 64th is. So `DUR` landing on
-`64` writes `$20`, the grid draws it as `64.`, and the dot changes nothing about its length — a
-64th is only longer when the triplet mark replaces it.
+**A 64th is never dotted.** It is the shortest length the format writes, and the value that means
+"64th" already uses the place a dot would take, so a 64th is either plain or a triplet and the `.`
+key swaps between those two. The `DUR` cell reads `64` or `64*` accordingly.
 
 `TIE` comes straight after the duration, and it means "hold, do not restrike": the player carries
-the sound through into the next event. It is the duration byte's bit 6.
+the sound through into the next event instead of striking the note again.
+
+### When a cell says `?`
+
+The grid's **row is the finest length the tempo can write** — a 16th at `TEM 144`, a 32nd at `TEM 192`
+— but a note can be *shorter* than a row: `TEM 192` grants a 64th, which is half a 32nd row. Such a
+note cannot be drawn where it starts, so the editor draws it on the row it falls inside, leaves the
+dot cell empty, and puts `?` in the lane's last cell instead. **Nothing about the note changes**: it
+plays at its true length, and the event after it follows immediately, on the same row.
+
+So two 64ths in a 32nd-row grid read differently: the first starts exactly on the row and prints
+`64`, the second follows it half a row later and prints `64   ?`.
+
+```
+ 01 ... 32          a 32nd rest fills the row
+ 02 F#1 64          starts on the row: no mark
+ 03 G-1 64    ?     starts half a row in, so the row is not where it starts
+```
+
+**`SHIFT`+`U` removes it**, by refining the row unit to the next finer one that divides exactly: with
+a 64th-per-row grid each 64th sits on its own row, prints `64`, and the `?` has nothing to report.
+The cell appears on any row whose event starts between rows, so it is the grid saying *"the row you
+are looking at is not where this starts"*, never a complaint about the note.
+
+**A command line on a `?` row fires at the *end* of that row.** A row draws its command lines above
+its own line, because a command written at a boundary takes effect before the note it governs. A
+squeezed event is the one case where that reading breaks: the note starts *inside* the row and the
+command that closes the voice comes after it, yet the command still takes the line above. So the last
+lane of a tune can read
+
+```
+ 03 G-1 64    ?
+    HLT
+```
+
+with the `HLT` above the note even though the voice plays that note first and halts when it runs out.
+The terminator is at the end of row 03, not before it, and the note is not past it: the editor never
+writes a pair after a voice's `HLT` and never draws one there either.
+
+**To read such a lane in playing order, refine the rows.** `SHIFT`+`U` until the last note fills whole
+rows puts the `HLT` on a row of its own below it:
+
+```
+ 03 G-1 64
+ 04    HLT
+```
 
 A command line prints its mnemonic in reverse video and its operand plain, so the value is easy to
 read, and it never fills the row-number column — a command is not a point in time, so the row's own
 line below it is the numbered one. A row's **sound** commands (envelope, wave, filter and the rest)
 take the lines furthest from it and its **structural** ones — `TEM` `UTL` `UTV` `HED` `DEF` `CALL`
 `TAL` `HLT` `END` — the lines nearest it, so a row's control flow always sits right above the note it
-governs.
+governs. A row whose own note starts between rows is the one exception, and
+[when a cell says `?`](#when-a-cell-says-) covers it.
 
 Each lane is drawn in its own voice's colour — red, yellow, cyan — the same colours as that voice's
 dots on the piano, so a note and the dot that follows it are one thing seen twice. The row numbers,
@@ -309,13 +350,17 @@ The piano at the bottom of the screen is how notes go in.
    keeping, so the new note takes the armed duration. Inside a longer note the note is split; past
    the last event, or in an empty voice, rests are filled in so the note lands on the cursor's row.
 
-**A note key also moves the cursor on.** In overwrite mode (`OVR`, the default) each note you play
-from the keyboard leaves the cursor on the next row, so a run of notes goes down in one pass instead
-of you moving the cursor between them. It is still overwrite: a note typed on a row that already
-holds one replaces it, and nothing below is pushed down. A row's **command** lines are passed over on
-the way — a command takes no time, so the next note belongs on the row's own line below them — and
-the window scrolls a line at a time once the cursor reaches the bottom of the band. Clicking a key on
-the piano does **not** move the cursor, because a click is a deliberate "make *this* cell this
+**A note key also moves the cursor past what it wrote.** In overwrite mode (`OVR`, the default) each
+note you play from the keyboard takes its own rows — a whole note takes eight of them — and the
+cursor ends up on the **first row after its end**, so you can keep typing notes of that length and
+they lay themselves down end to end. A note shorter than one row still moves the cursor one row, so
+it never lands on top of what you just entered. **Splitting only happens when you ask for it**: a
+note typed on a row in the middle of a longer note splits that note, and that is now something you
+reach by deliberately moving the cursor there. It is still overwrite — a note typed on a row that
+already holds one replaces it, and nothing below is pushed down. A row's **command** lines are passed
+over on the way — a command takes no time, so the next note belongs on the row's own line below them
+— and the window scrolls a line at a time once the cursor reaches the bottom of the band. Clicking a
+key on the piano does **not** move the cursor, because a click is a deliberate "make *this* cell this
 pitch".
 
 **The pitch sounds as you point at it.** Hovering a key — or pressing a note key — plays it for a
@@ -373,13 +418,23 @@ with `? illegal duration`, and a tune that needs them usually wants a multiple o
 **double-dotted** lengths are refused when the tempo cannot express them as whole jiffies: a dotted
 note needs an even base length, a double-dotted one a base divisible by four.
 
+**A 64th is never dotted.** It is the shortest length the format writes, and the value that means
+"64th" already uses the place a dot would take, so a 64th is either plain or a triplet: `.` swaps
+between those two, and the bar's dot cell shows a blank or `*`, never a `.`.
+
 **The tie** joins a note to the one after it into a single sound. It is armed with `,` or by clicking
 `TIE` in the bar — both toggle the same flag, so the cell lights whichever way you armed it. It
-rides the armed value the way the dots do, so it reaches every note a note key writes, including one
-written into an empty row, where the length may be laid down as two tied pairs of its own. The grid
+rides the armed value the way the dots do, so it reaches every note a note key writes. The grid
 shows it as `TIE` after the duration, which is also how a tied event already in a tune reads — a
-dotted, tied note reads `C-4 8. TIE` and is the duration byte's bits 6 and 5 together. A rest never
-carries a tie, and entering a rest clears the bit from a note that had one.
+dotted, tied note reads `C-4 8. TIE`: a dotted eighth that is held on instead of struck again. A rest
+never carries a tie, and entering a rest clears it from a note that had one.
+
+**A note you type is one event**, and it stores exactly the length the bar shows: the dot, the second
+dot, the triplet mark and the utility length all survive, so a dotted whole at 144 reads `C-4 1.` and
+nothing after it says `TIE`. **TIE** appears only where a length had to be laid down as several
+events of the same pitch — the rests that fill a gap, the piece of an event a split leaves behind —
+where every event after the first is marked so the player holds one sound across them instead of
+striking each one.
 
 When you tie notes of **different** lengths, put the shorter one first. A tied note does not release,
 so the release can only begin at the last note of the chain — and with a larger `PNT` the release
@@ -388,9 +443,8 @@ would otherwise have started inside the long note and been pushed later than the
 ### Utility lengths
 
 `8` arms the **`UTL`** length and `9` the **`UTV`** length. A note entered with one of these takes
-its duration from the `UTL` command (all voices) or the `UTV` command (this voice) instead of from
-its own duration bits — useful for a delayed or gated voice. Both forms round-trip as ordinary
-notes.
+its length from the `UTL` command (all voices) or the `UTV` command (this voice) instead of from its
+own length — useful for a delayed or gated voice. Both forms round-trip as ordinary notes.
 
 **`UTL 0` is 256 jiffies**, like every other byte-valued length here: the player decrements and
 tests, so zero means "all the way round". A tune that never sets `UTL` starts at **12 jiffies**,

@@ -1722,9 +1722,11 @@ whole voice for harmony or percussion, which is usually worth more than a fuller
 split a longer one undoes as a single step, not one per event it wrote. A long run of recent actions
 is held; opening a tune resets the history.
 
-The history lives in a 2 KB file called `musedit.und`, made when the editor opens and **deleted when
-you quit**, so a session leaves nothing behind. It costs the same space however much you edit, and
-`compact` is what returns the directory slot to the filesystem.
+The history lives in this task's own 4 KB REU workspace — the private block the kernel gives every
+task slot — so it costs the filesystem nothing: there is no file to create, no directory slot for
+`compact` to reclaim, and nothing left behind when you quit. It costs the same space however much you
+edit, and a task is spawned into a zeroed workspace, which is why opening a tune starts with an empty
+history.
 
 ## Saving, quitting, and what is left behind
 

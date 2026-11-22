@@ -118,7 +118,7 @@ Two things happen to a host name on the way in, and both are reported — never
 done silently.
 
 **Characters with no key are dropped.** A name is typed on the machine as often
-as it is typed here: `load` takes it, `dir` shows it, and the font draws it
+as it is typed here: `dir` shows it, and the font draws it
 straight from the directory bytes. So a character the C64 keyboard cannot type
 has no glyph either — an underscore is stored as screen code `$5F`, which
 `charsets/gordon.fnt` draws as a checkerboard. It is removed:

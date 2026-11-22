@@ -136,7 +136,8 @@ to the tune's name by themselves.
 ### Row 1 — the lanes, and OVR/INS
 
 `ROW VOICE 1     VOICE 2     VOICE 3` names the three lanes, in the SID's own voice order. At the
-right, `OVR` or `INS` says what the next note entry will do (overwrite, or insert).
+right, `OVR` or `INS` says what the next note entry will do (overwrite, or insert) — and likewise
+whether adding a command replaces one of its kind already on that row or adds a second.
 
 That readout is also a **button**: the pointer reverses it while it is over it, and a click toggles
 the mode — the `M` key by another route. Because the readout *is* the button, what it says and what
@@ -282,9 +283,11 @@ makes as it goes.
 
 ![the bar prompt in row 0](img/musedit-bar.png)
 
-`SHIFT`+`B` opens a prompt in row 0 showing `BAR` and the bar you are on. Digits replace the number,
-`INST/DEL` backs one digit out, `RETURN` goes there, and `STOP` leaves you where you were. `SHIFT`+`N`
-and `SHIFT`+`P` step a bar at a time without the prompt.
+`SHIFT`+`B` opens a prompt in row 0 showing `BAR` and the bar you are on, with the blinking block on
+the value. As in a command line the **first** digit replaces the number and later digits extend it;
+`INST/DEL` backs one digit out, and once the field is empty it does nothing, there being no
+mnemonic step to step back to. `RETURN` goes there and `STOP` leaves you where you were.
+`SHIFT`+`N` and `SHIFT`+`P` step a bar at a time without the prompt.
 
 A bar the tune never reaches answers `? no such bar` and leaves the view alone. Otherwise the cursor
 lands on the row's **own line** — the note line, not one of the command lines above it — with the
@@ -464,8 +467,8 @@ works, and it is why the grid never shows overlaps.
 | `SHIFT`+`I` | **insert a bar** (the rows a bar has at the tempo in force where the cursor is) |
 | `R` | **delete a row** at the cursor, in all three voices |
 | `SHIFT`+`R` | **delete a bar** — the same rows `SHIFT`+`I` would open |
-| `M` | **insert/overwrite mode** for entering notes (the `OVR`/`INS` readout) |
-| `C` | **write or edit the command** at the cursor |
+| `M` | **insert/overwrite mode** for entering notes and for adding a command (the `OVR`/`INS` readout) |
+| `C` | **write or edit the command** at the cursor — on a row's own line it adds one, on a command line it edits that one |
 | `SHIFT`+`D` | **follow a phrase**: from a `CALL` to its `DEF`, from a `DEF` to the next `CALL` |
 | `Z` / `X` | undo / redo |
 
@@ -482,7 +485,9 @@ another one already sits, or to open a bar in the middle of a tune — insert in
 - **`SHIFT`+`I` opens a whole bar** — 8, 16, 32 or 64 rows, whichever a bar is at the tempo in force
   where the cursor is. A tune that changes tempo has bars of different lengths, and the bar inserted
   is the one that fits the part you are in, so every bar number before it is unchanged.
-- **`M` switches note entry to insert** — as does a click on the `OVR`/`INS` readout. With `INS`
+- **`M` switches note entry to insert** — as does a click on the `OVR`/`INS` readout. The same mode
+  decides whether **adding** a command replaces one of its kind already on that row (`OVR`) or adds a
+  second pair (`INS`); it never changes what editing an existing command line does. With `INS`
   showing, entering a note writes it **after** the event the cursor's line holds, opening that
   note's length in **that voice only** so its later events move down, and the cursor follows the new
   note. The other two lanes keep exactly the events they had, so a voice you have not written to yet
@@ -641,7 +646,7 @@ row becomes the prompt:
 | CRSR up / down | choose any of the 49 commands the picker offers, in the format's own order |
 | `RETURN` | take it, then finish its value — or write it straight away for `TAL`, `HLT`, `END` |
 | digits | build the value in decimal, never past what that command takes |
-| `INST/DEL` | back one digit out |
+| `INST/DEL` | back one digit out; on a field you have emptied, back to the mnemonic |
 | `STOP` | cancel, and the grid comes back as it was |
 
 The list runs from the tune's own settings — `TEM` `UTL` `UTV` `HED` `DEF` `CALL` `TAL` `HLT` `END` —
@@ -655,6 +660,13 @@ renumbering.
 `MS#` up to 999, `P-W` and `DTN` up to 4095, `POR` up to 16383. A value the command cannot hold is
 clamped to its maximum rather than refused, so what the prompt shows is always what gets written.
 
+The field opens showing the value the command already has, `0` included, and the **first** digit you
+type **replaces** it — re-entering `VOL 7` and typing `3` gives `3`, not `73`; type `37` to get `37`.
+Backing out the last digit leaves the field genuinely empty rather than showing a `0`, and one more
+`INST/DEL` then steps back to the mnemonic so you can pick a different command. The blinking block
+sits where the next digit goes, so the prompt waiting for a value never looks like a prompt waiting
+for a mnemonic.
+
 The prompt takes **digits only** — there is no minus key — and it shows and stores the number the
 player itself reads. For the commands whose effect is a signed number that is not the number you
 have in mind; *Signed operands*, below, gives the conversion for each of them.
@@ -664,8 +676,24 @@ second writes the value: the head shows you where you are, and once you have tak
 digits you type build the number that will be written. If the number you write makes the tune
 unplayable, the editor says so and puts everything back — see below.
 
-**Overwrite or insert** — the mode `M` shows decides what happens when that boundary already carries
-the same command: `OVR` replaces it where it stands, `INS` adds a second pair.
+**Overwrite or insert** — the `OVR`/`INS` mode reaches command entry too, but only for a command you
+are **adding**: when the row already carries one of that kind, `OVR` replaces it where it stands and
+`INS` adds a second pair. It does not apply to *editing*. `C` on an existing command line always
+changes **that** pair, in either mode, because the line you are pointing at is the one you meant to
+change. So to give a row a second command, put the cursor on the row's own numbered line and press
+`C` there; pressing `C` on the command already there edits it instead.
+
+**Where a new pair goes.** A command takes no time, so it is written at the end of the row's command
+run, immediately before the note or rest itself: it is the last thing the voice does before that note
+sounds. Adding several commands to one row therefore lays them out in the order you added them — the
+first ends up furthest from the note and the last nearest. What the lines *show* is grouped by kind
+rather than by order: the row's sound commands sit on the lines further above the note and the
+structural nine on the lines nearest it.
+
+A row only has a boundary if an event *starts* there, so a row in the middle of a longer note cannot
+take a command — the format has no way to split the note, and the editor answers `? no event here`
+rather than writing a pair that would fire at the wrong moment. Put the command on the row the note
+starts on instead; a command there applies from that note's onset.
 
 **Editing and removing** — put the cursor on an existing command line and `C` opens the prompt *on
 that line*, already filled in and ready to change; `SHIFT`+`INST/DEL` removes that pair and closes
